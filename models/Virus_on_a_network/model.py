@@ -5,9 +5,11 @@ from scipy.spatial import distance
 import numpy as np
 import sys
 from tqdm import tqdm
+import time
 
 
 class VirusModel(Model):
+
     def __init__(self):
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(41, 41, False)
@@ -63,8 +65,8 @@ class VirusModel(Model):
         return distance.euclidean(alter.position, ego.position)
 
     def step(self):
-        if all([not agent.infected for agent in self.schedule.agents]):
-            sys.exit("Immunity reached in " + str(self.tick) + str(" ticks"))
+        # if all([not agent.infected for agent in self.schedule.agents]):
+        #     sys.exit("Immunity reached in " + str(self.tick) + str(" ticks"))
         for agent in self.schedule.agents:
             agent.virus_check_timer += 1
             if agent.virus_check_timer >= self.virus_check_frequency:
@@ -141,6 +143,7 @@ model = VirusModel()
 model.run()
 
 plot_grid()
+
 
 
 
