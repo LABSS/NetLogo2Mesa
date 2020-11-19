@@ -6,11 +6,13 @@ import numpy as np
 import sys
 from tqdm import tqdm
 import time
+from typing import Union
 
 
 class VirusModel(Model):
 
     def __init__(self):
+        super().__init__()
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(41, 41, False)
         self.tick = 0
@@ -82,7 +84,7 @@ class VirusModel(Model):
 
 class Node(Agent):
 
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model: Model):
         super().__init__(unique_id, model)
         self.neighbors = set()
         self.position = 0

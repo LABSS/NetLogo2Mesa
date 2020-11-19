@@ -1,10 +1,16 @@
 from mesa.model import Model
 from mesa.agent import Agent
+from mesa.time import RandomActivation
+from numpy.random import default_rng
+import time
 
 
 class VirusModel(Model):
 
-    def __init__(self, number_of_nodes: int = 150) -> None:
+    def __init__(self, number_of_nodes: int = 150, seed: int = int(time.time() % 60)) -> None:
+        super().__init__(seed=seed)
+        self.seed = seed
+        self.rng = default_rng(self.seed)
         self.number_of_nodes = number_of_nodes
         self.gain_resistence_chance = 5.0
         self.recovery_chance = 5.0
@@ -36,23 +42,3 @@ class Node(Agent):
 if __name__ == "__main__":
     model = VirusModel()
     node = Node(model, 1)
-
-
-
-    # class Model:
-    #     def __init__(self):
-    #         self.model_variable = 0
-    #
-    # class MyModel(Model):
-    #     def __init__(self):
-    #         super().__init__()
-    #         self.my_model_variable = 0
-    #
-    # class Foo:
-    #     def __init__(self, model: Model):
-    #         self.model = model
-    #         print(self.model.model_variable)
-    #         print(self.model.my_model_variable)
-    #
-    # mymodel = MyModel()
-    # foo = Foo(mymodel)
