@@ -129,7 +129,7 @@ import time
 
 class VirusModel(Model):
 
-    def __init__(self, number_of_nodes = 150, seed = int(time.time() % 60)):
+    def __init__(self, number_of_nodes=150, seed=int(time.time() % 60)):
         super().__init__(seed=seed)
         self.seed = seed
         self.tick = 0
@@ -177,7 +177,13 @@ if __name__ == "__main__":
 
 ##### Step 3, Create the setup
 
-We have our blueprint now is the time to implement the procedures that organize the initial status of the model, simply everything in Netlogo is included in the "setup" procedure. This part consists of the following procedures that we will analyze and translate into python one by one:
+We have our blueprint now is the time to implement the procedures that organize the initial status of the model or simply everything in Netlogo is included in the "setup" procedure. 
+
+###### What does the Virus on a network Model setup do?
+
+The setup starts by generating all the necessary nodes ( number-of-nodes) and gives it 3 fundamental properties: a position on space (defined by an x and y), an initial state (S) and a value for virus-check-timer. If we visualize our space at this point we will see many points stochastically positioned on a space. The next step is to join these points creating a network, the algorithm that performs this process is very simple, it defines a maximum number of nodes that depends on average-node-degree and number-of-nodes, it starts a cycle of iterations that ends when the total number of links will be greater than the maximum number of links. Each iteration a random node is taken and linked to another node nearby, as long as these two do not already have a link. Finally, a number of nodes equal to initial-outbreak-size is set to infected.
+
+We will analyze and translate into python procedure by procedure:
 
 ```Netlogo
 to setup
@@ -193,7 +199,9 @@ end
 
 ###### setup-nodes
 
-This procedure defines a default form for all agents, a circle, then generates as many agents as required by the number-of-nodes parameter and assigns to each one an x value and a random y value on a plane activates the become-susceptible procedure and assigns a random value to the virus-check-timer attribute.
+Let's skip the primitive [clear-all](http://ccl.northwestern.edu/netlogo/docs/dict/clear-all.html), in python we don't need this, simply every time we want to create a new model we create another instance of VirusModel.
+
+The  procedure setup-nodes defines a default form for all agents, a circle, then generates as many agents as required by the number-of-nodes parameter and assigns to each one an x value and a random y value on a plane activates the become-susceptible procedure and assigns a random value to the virus-check-timer attribute.
 
 ```
 to setup-nodes
@@ -207,7 +215,59 @@ to setup-nodes
 end
 ```
 
-Let's start the translation, first of all, for now we will not deal with the instructions related to the visualization ( `set-default-shape turtles "circle"`) then let's go directly to the node generation.  In netlogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands, in python we can emulate this behavior with a simple for cycle. Inside the model we define a new setup-nodes method, we implement a simple for loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. At this point within the for cycle we have to make each node execute the following instructions:
+Let's start the translation, first of all, for now we will not deal with the instructions related to the visualization ( `set-default-shape turtles "circle"`) then let's go directly to the node generation.  In netlogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands, in python we can emulate this behavior with a simple for cycle. Inside the model we define a new setup-nodes method, we implement a simple for loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. 
 
-1. `setxy (random-xcor * 0.95) (random-ycor * 0.95)`
+```python
+def setup_nodes(self):
+    for id in range(self.number_of_nodes):
+        new_node = Node(model=self, unique_id=id)
+        self.schedule.agents.add(new_node)
+
+def setup(self):
+	self.setup_nodes()
+```
+
+Remember that every time a new Node is instantiated the special `__init__` method is executed, this means that we can specify the initial properties of each Node within the `__init__` of the Node and not within setup_nodes. To define the random coordinates of each node we just use the default_rng instance we created inside the model and called VirusModel.rng the [numpy.random.default_rng.integers](https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.integers.html#numpy.random.Generator.integers) function returns an integer in a given range in this case we want an integer from 0 to VirusModel.space_width for the x and from 0 to VirusModel.space_height for the y. We have our random coordinates for each Node, now we give it an initial state, defined in Netlogo by the become-susceptible procedure that simply sets infected to False and resistant to False. and finally we set a virus-check-timer represented by a integer random from 0 to virus-check-frequency. 
+
+```python
+class Node(Agent):
+
+    def __init__(self, model, unique_id):
+        super().__init__(unique_id, model)
+        self.model = model
+        self.unique_id = unique_id
+        self.x = self.model.rng.integers(0, self.model.space_width)
+        self.y = self.model.rng.integers(0, self.model.space_height)
+        self.infected = False
+        self.resistant = False
+        self.virus_check_timer = self.model.rng.integers(0,                                                                                       self.model.virus_check_frequency)
+```
+
+###### display the nodes in space
+
+In case you are short of motivation seeing something graphic might cheer you up. For this visualization we will use matplolib, first thing then, we import the package. 
+
+```python
+import matplotlib
+matplotlib.use('Qt5Agg')
+import matplotlib.pyplot as plt
+```
+
+To show the points we will use a simple scatterplot using the  [matplotlib.pyplot.scatter](https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.scatter.html) function that takes two basic parameters a series of x and a series of y. The first number of the x series will correspond to the x of the first node and the same for the y series. We must then generate two sets of numbers one that will contain all the x of each node and the other that will contain all the y of each node. Inside the model we create a new method, show_space, and we collect the x's and y's through a [list comprehension](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions). We don't want to see a space with useless dots, so we also take the unique_id of each node so we can print it next to each dot. Then we install a new figure, create a scatter and insert labels at each point.
+
+```python
+def show_space(self):
+	x = [agent.x for agent in self.schedule.agents]
+	y = [agent.y for agent in self.schedule.agents]
+	labels = [agent.unique_id for agent in self.schedule.agents]
+	fig, ax = plt.subplots()
+	ax.scatter(x, y)
+	for i, txt in enumerate(labels):
+		ax.annotate(txt, (x[i]+0.1, y[i]+0.1), color="red")
+	plt.show()
+```
+
+Et voilà, our nodes, which are actually points, but we will soon create a network.
+
+![plot_1](img\plot_1.png)
 
