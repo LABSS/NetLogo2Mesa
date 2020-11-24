@@ -269,5 +269,4 @@ def show_space(self):
 
 Et voilà, our nodes, which are actually points, but we will soon create a network.
 
-![plot_1](img\plot_1.png)
-
+![title](img/plot_1.png)
