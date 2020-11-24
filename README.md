@@ -240,7 +240,7 @@ class Node(Agent):
         self.y = self.model.rng.integers(0, self.model.space_height)
         self.infected = False
         self.resistant = False
-        self.virus_check_timer = self.model.rng.integers(0,                                                                                       self.model.virus_check_frequency)
+        self.virus_check_timer = self.model.rng.integers(0, self.model.virus_check_frequency)
 ```
 
 ###### display the nodes in space
