@@ -38,6 +38,14 @@ class VirusModel(Model):
     def setup(self):
         self.setup_nodes()
 
+    def setup_spatially_clustered_network(self):
+        num_links = (self.average_node_degree * self.number_of_nodes) / 2
+        while sum([len(node.neighbors) for node in self.schedule.agents]) < num_links:
+            from_agent = self.rng.choice(self.schedule.agents)
+            agent_to = min([ego for ego in self.schedule.agents if ego != from_agent and ego not in from_agent.neighbors],
+                            key=lambda x: self.get_distance(alter,x))
+
+
     def show_space(self):
         x = [agent.x for agent in self.schedule.agents]
         y = [agent.y for agent in self.schedule.agents]
@@ -55,6 +63,7 @@ class Node(Agent):
 
     def __init__(self, model, unique_id):
         super().__init__(unique_id, model)
+        self.neighbors = set()
         self.model = model
         self.unique_id = unique_id
         self.x = self.model.rng.integers(0,self.model.space_width)
@@ -66,6 +75,10 @@ class Node(Agent):
 
     def __repr__(self):
         return "Node: " + str(self.unique_id)
+
+    def create_link_with(self, ego):
+        self.neighbors.add(ego)
+        ego.neighbors.add(self)
 
 
 if __name__ == "__main__":

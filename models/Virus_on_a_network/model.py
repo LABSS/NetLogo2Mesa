@@ -46,8 +46,8 @@ class VirusModel(Model):
 
 
     def setup_spatially_clustered_network(self):
-        num_links = (self.average_node_degree * self.number_of_nodes)
-        while np.sum([len(node.neighbors) for node in self.schedule.agents]) < num_links:
+        num_links = (self.average_node_degree * self.number_of_nodes)/2
+        while np.sum([len(node.neighbors) for node in self.schedule.agents])/2 < num_links:
             alter = self.random.choice(self.schedule.agents)
             choice = sorted([ego for ego in self.schedule.agents if ego != alter and ego not in alter.neighbors],
                             key=lambda x: self.get_distance(alter,x))[0]
@@ -88,9 +88,9 @@ class Node(Agent):
         super().__init__(unique_id, model)
         self.neighbors = set()
         self.position = 0
-        self.infected = False  # if true, the turtle is infectious
-        self.resistant = False  # if true, the turtle can't be infected
-        self.virus_check_timer = self.model.random.uniform(1, self.model.virus_check_frequency)  # number of ticks since this turtle's last virus-check
+        self.infected = False
+        self.resistant = False
+        self.virus_check_timer = self.model.random.uniform(1, self.model.virus_check_frequency)
 
 
     def __repr__(self):

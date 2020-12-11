@@ -253,7 +253,7 @@ matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 ```
 
-To show the points we will use a simple scatterplot using the  [matplotlib.pyplot.scatter](https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.scatter.html) function that takes two basic parameters a series of x and a series of y. The first number of the x series will correspond to the x of the first node and the same for the y series. We must then generate two sets of numbers one that will contain all the x of each node and the other that will contain all the y of each node. Inside the model we create a new method, show_space, and we collect the x's and y's through a [list comprehension](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions). We don't want to see a space with useless dots, so we also take the unique_id of each node so we can print it next to each dot. Then we install a new figure, create a scatter and insert labels at each point.
+To show the points we will use a simple scatterplot using the  [matplotlib.pyplot.scatter](https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.scatter.html) function that takes two basic parameters a series of x and a series of y. The first number of the x series will correspond to the x of the first node and the same for the y series. We must then generate two sets of numbers one that will contain all the x of each node and the other that will contain all the y of each node. Inside the model we create a new method, show_space, and we collect the x's and y's through a [list comprehension](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions). We don't want to see a space with useless dots, so we also take the unique_id of each node so we can print it next to each dot. Then we instantiate a new figure, create a scatter and insert labels at each point.
 
 ```python
 def show_space(self):
@@ -267,6 +267,55 @@ def show_space(self):
 	plt.show()
 ```
 
-Et voilà, our nodes, which are actually points, but we will soon create a network.
+Et voilà, our nodes!
 
 ![title](img/plot_1.png)
+
+##### setup-spatially-clustered-network
+
+```netlogo
+to setup-spatially-clustered-network
+  let num-links (average-node-degree * number-of-nodes) / 2
+  while [count links < num-links ]
+  [
+    ask one-of turtles
+    [
+      let choice (min-one-of (other turtles with [not link-neighbor? myself])
+                   [distance myself])
+      if choice != nobody [ create-link-with choice ]
+    ]
+  ]
+end
+```
+
+There are many ways to create a spatially clustered nework, for completeness in this guide we will follow the same algorithm used in netlogo example code. The method that is used follows this procedure: It iterates for as many times as  a maximum number of links (num-links), when this maximum is reached the procedure stops. Each iteration takes a random node and based on this a further node is taken that has no link with the first one and is the closest of all the other nodes. If there is a node with these characteristics these two nodes are connected. 
+
+Before starting to translate this part of the code we need to define a method to keep inside each node its neighbors, or rather, the other nodes with which every other node has a link. Python offers the set which is one of the 4 built-in data structures of python, the sets are unordered and non-indexed collections. They are perfectly suited for this type of task as the sets cannot contain two equal values. To implement this data structure we just need to insert a set attribute to our Node class. 
+
+```python
+class Node(Agent):
+
+    def __init__(self, model, unique_id):
+        super().__init__(unique_id, model)
+        self.neighbors = set()
+        .
+        .
+```
+
+We also create a method within the Node class that allows us to add other nodes to the neighbors list. The links we will create are undirected i.e. if node1 is neighbor of node2 then node2 will also be neighbor of node1. [Notes on networks science.](https://mathinsight.org/network_introduction) The create_link_with function takes another node as argument and just adds the tow nodes in the respective neighbors sets, using the [Set.add()](https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset) built-in method
+
+```python
+def create_link_with(self, ego):
+	self.neighbors.add(ego)
+	ego.neighbors.add(self)
+```
+
+Let's return to the procedures that define the spatially clustered network, we define a maximum number of nodes (num_links) and start a cycle of iterations using a while loop.  This loop will make as many interactions as the num_links, to calculate all the links we create at each iteration we access the scheduler we iterate between nodes and for each node we calculate how many neighbors it has, add everything up and divide by two.  We take an agent (from-agent) randomly using the numpy.default_rng instance and the choice() function. Now we need to find an agent that does not have a link with from_agent and is spatially the closest. To do this we need a function that calculates the distance between two agents. Without reinventing the wheel, the scipy library offers the spatial.distance module, inside this module we find the euclidean function that allows us to calculate the euclidean distance between two points. Consequently we import the library on top of our scipt as follow: `from scipy.spatial import distance`.
+
+```python
+num_links = (self.average_node_degree * self.number_of_nodes) / 2
+while sum([len(node.neighbors) for node in self.schedule.agents]) < num_links:
+    from_agent = self.rng.choice(self.schedule.agents)
+
+```
+
