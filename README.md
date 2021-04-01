@@ -2,20 +2,32 @@
 
 ...and other stuff that will help you avoid headaches. 
 
+## Why should I convert my agent-based-model from Netlogo to Python?
+
+
+
+## What Python-tools should I use?
+
 In this little guide we will take a model written in [Netlogo](https://github.com/NetLogo/NetLogo) and we will transform it into a Python model. We will take the [NetLogo Virus on a Network model](https://ccl.northwestern.edu/netlogo/models/VirusonaNetwork) developed by Stonedahl and Wilensky in 2008, as example written in Netlogo. The model demonstrates the spread of a virus within a network, composed of nodes that can assume 3 states: **S**usceptible, **I**nfected, or **R**esistant. In the academic literature models of this type are called **SIR** models. Infected nodes can transmit the virus to their neighbors, susceptible nodes can be infected and resistant nodes cannot contract the virus. What happens at each temporal step we will see later. For now it is important to emphasize that in almost every Agent based model (from now ABM), including this one, there are two main phases: the setup, where we create our synthetic environment and the runtime, where the agents interact with each other. These two phases are clearly separable from each other even on an abstract level. 
 
 ###### What tools will we use?
 
-As much as possible, there are endless ways to write a procedure in Python in this guide we will try to cover some of them. We will use the following packages: 
+As much as possible, there are endless ways to write a procedure in Python in this guide we will try to cover some of them. Let's start with the basics, there are 2 main packages in python for building agent based models:
 
-- [Mesa](https://github.com/projectmesa/mesa): an agent-based modeling framework in Python
-- [NetworkX](https://networkx.org/): a Python package for the creation, manipulation, and study of the structure, dynamics, and functions of complex networks.
+- [Mesa](https://github.com/projectmesa/mesa): 
+- [Agentpy](https://agentpy.readthedocs.io/en/latest/): 
+
+## How to read this guide?
+
+
 
 ------
 
-##### Step 1, Create the blueprints
+## From Netlogo  to Mesa:
 
-At a high level of abstraction the model we are going to create can be defined as a single object, a class. This object has its **attributes**, such as the number of agents or nodes in our case, and its **methods**, the procedures specific to our model such as the algorithm that generates the network. So let's start by creating our model. In python each object has its own `__init__` method, this method is called every time a new VirusModel object is instantiated, it is good practice to define here all the attributes of our model. ( here is where we define all the variables that in Netlogo are under the name [globals](http://ccl.northwestern.edu/netlogo/docs/dict/globals.html)) The first attribute we define is `VirusModel.number_of_nodes` which simply represents the number of nodes. We don't want a fixed number of nodes so we insert as parameter of the `__init__` the keyword `number_of_nodes` specify the type `int`, and give it a default value (150). In this way every time a new Model object is instantiated we can define a number of nodes, if we don't do it `VirusModel.number_of_nodes` will be equal to default value. Now it's time to introduce the global attributes, including those that in Netlogo are stored in the graphical interface, and give them a default value. These are: gain-resistance-chance, recovery-chance, virus-spread-chance, virus-check-frequency, initial-outbreak-size, average-node-degree. Now we must define the size of the graphic space, in netlogo this information is contained in the Interface section or by opening the .nlogo file with a text editor in the `GRAPHICS-WINDOW` section. From here we can see that the width of the space goes from -20 to 20 and the height from -20 to 20, in python for simplicity we will say that the `ViruslModel.space_width = 40` and `ViruslModel.space_heigh = 40`. So our space will go from 0 to 40 in the x-axis and y-axis. We want a model that has style, so we name our model object using the special `__repr__` method, every time we print an instance of the VirusModel this method is called. 
+### Step 1, Create the blueprints
+
+At a high level of abstraction the model we are going to create can be defined as a single object, a python-class. This object has its **attributes**, such as the number of agents or nodes in our case, and its **methods**, the procedures specific to our model, such as the algorithm that generates the network. So let's start by creating our model. In python each object has its own `__init__` method, this method is called every time a new VirusModel object is instantiated, it is good practice to define here all the attributes of our model (e.g. here is where we define all the variables that in Netlogo are under the name [globals](http://ccl.northwestern.edu/netlogo/docs/dict/globals.html)). The first attribute we define is `VirusModel.number_of_nodes` which simply represents the number of nodes. We don't want a fixed number of nodes so we insert as parameter of the `__init__` the keyword `number_of_nodes` specify the type `int`, and give it a default value (150). In this way every time a new Model object is instantiated we can define a number of nodes, if we don't do it `VirusModel.number_of_nodes` will be equal to default value. Now it's time to introduce the global attributes, including those that in Netlogo are stored in the graphical interface, and give them a default value. These are: gain-resistance-chance, recovery-chance, virus-spread-chance, virus-check-frequency, initial-outbreak-size, average-node-degree. Now we must define the size of the graphic space, in netlogo this information is contained in the Interface section or by opening the .nlogo file with a text editor in the `GRAPHICS-WINDOW` section. From here we can see that the width of the space goes from -20 to 20 and the height from -20 to 20, in python for simplicity we will say that the `ViruslModel.space_width = 40` and `ViruslModel.space_heigh = 40`. So our space will go from 0 to 40 in the x-axis and y-axis. We want a model that has style, so we name our model object using the special `__repr__` method, every time we print an instance of the VirusModel this method is called. 
 
 We have our simple model, now it is time to create nodes, the agents of our model. So we create the Node class and define the special `__init__` method, here we will insert the attributes of each agent. The attributes of agents in a Netlogo model are contained within the primitive turtle-related `<breeds>-own`. In the example model nodes have these properties: 
 
@@ -71,7 +83,7 @@ if __name__ == "__main__":
     
 ```
 
-##### Step 2, Enhance Core classes
+### Step 2, Enhance Core classes
 
 Before we go to write the procedures of our model and our agents, we must have a machine that has the necessary functionality. The mesa package gives us some interesting tools to enhance our model, which otherwise were to be implemented from scratch. The [two basic mesa modules](https://mesa.readthedocs.io/en/master/apis/init.html) are mesa.agent and mesa.model, these modules give us the basic mesa.model.Model and mesa.agent.Agent classes. These two classes, have their methods and attributes that we want to implement within our VirusModel (our model) and Node (our agents). In Python this mechanism is implementable through inheritance, when we create a new class, passing as parameter an existing class, the new class will inherit all methods and attributes. 
 
@@ -80,9 +92,8 @@ from mesa.model import Model
 from mesa.agent import Agent
 
 class VirusModel(Model):
-	def __init__(self, number_of_nodes = 150, seed):
-        super().__init__(seed=seed)
-
+	def __init__(self, number_of_nodes = 150):
+        
         
 class Node(Agent):
     def __init__(self, model, unique_id):
@@ -101,11 +112,33 @@ if __name__ == "__main__":
     print(model.random.random())
 ```
 
-The built-in random module offers many options and for a basic model like our example should be enough. But if you want a more complete random generator you have to use [numpy.random.default_rng](https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.default_rng). How do we implement it? Easy, first of all we import the module `from numpy.random import default_rng`, then we add an attribute to the VirusModel class `self.rng = default_rng()` this will be our random generator. At this point, however, it should be noted that we have two random generators, this in theory is not good practice, but if it is necessary we have no other choice. In addition to this, some modules of the mesa package such as mesa.time (which we will see later) work through the random.Random instance generated by the mesa.model.Model class. This is a problem because the two generators (random and numpy.random) have two different seeds. We need to make sure that the generators receive the same seed so it will be possible to create deterministic simulations. To do this we give a default parameter to the seed in the VirusModel class, we import the time module and take the time in seconds, this will be our seed that we will give to both instances (random and numpy.random), we also create a seed attribute so that it is externally accessible. If we want to reproduce two identical simulations we will just use the same seed, moreover if we do not provide a seed our model will generate a pseudo-random seed that we can access to replicate the simulation. Fantastic, isn't it?
+The built-in random module offers many options and for a basic model like our example should be enough. But if you want a more complete random generator you have to use [numpy.random.default_rng](https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.default_rng). How do we implement it? Easy, first of all we import the module `from numpy.random import default_rng`, then we add an attribute to the VirusModel class `self.random = default_rng()` this will be our random generator. In this way we override the random attribute of the Model base class of mesa. We also need to make sure that the random generator has a seed that makes the results of different simulations reproducible. We expect the following two behaviors when creating a new VirusModel instance
+
+1. By passing a seed as a parameter to VirusModel's init, numpy.random.default_rng() must use that seed.
+2. If no seed is passed, the model must generate one, save it and use that seed for the numpy.random.default_rng() instance.
+
+To do this we add a new parameter, `seed`, to the init of VirusModel. In order to implement behavior number 2, this parameter must take on a default value. We can use the os library and in particular the os.urandom() function to extract a string of bytes from our system. This function takes as parameter an integer, which represents the number of bytes of the string that is generated, 4 is more than enough. Also since it is a string of bytes we have to transform it into an integer using the sys library. 
+
+```python
+import os
+import sys
+
+class VirusModel(Model):
+
+    def __init__(self, number_of_nodes=150, seed=int.from_bytes(os.urandom(4), sys.byteorder)):
+        self.seed = seed
+        self.random = default_rng(self.seed)
+```
+
+If we want to reproduce two identical simulations we will just use the same seed, moreover if we do not provide a seed our model will generate a pseudo-random seed that we can access to replicate the simulation. Fantastic, isn't it?
 
 ###### Scheduler
 
-When we create our Nodes we would need a place to store them, to solve this problem the mesa package offers us the mesa.time module. This module offers us 3 classes that we have to choose according to our modeling needs, we will not go into detail as they are perfectly explained on the [mesa.time module documentation.](https://mesa.readthedocs.io/en/master/apis/time.html) For our model we will use the class mesa.time.RandomActivation, the scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of Netlogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
+When we create our Nodes we would need a place to store them, to solve this problem the mesa package offers us the mesa.time module. This module offers us 3 classes that we have to choose according to our modeling needs, we will not go into detail as they are perfectly explained on the [mesa.time module documentation.](https://mesa.readthedocs.io/en/master/apis/time.html) 
+
+For our model we will use the class mesa.time.BaseScheduler, the scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of Netlogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
+
+
 
 ```
 from mesa.time import RandomActivation
@@ -175,7 +208,7 @@ if __name__ == "__main__":
 
 
 
-##### Step 3, Create the setup
+### Step 3, Create the setup
 
 We have our blueprint now is the time to implement the procedures that organize the initial status of the model or simply everything in Netlogo is included in the "setup" procedure. 
 
@@ -290,32 +323,135 @@ end
 
 There are many ways to create a spatially clustered nework, for completeness in this guide we will follow the same algorithm used in netlogo example code. The method that is used follows this procedure: It iterates for as many times as  a maximum number of links (num-links), when this maximum is reached the procedure stops. Each iteration takes a random node and based on this a further node is taken that has no link with the first one and is the closest of all the other nodes. If there is a node with these characteristics these two nodes are connected. 
 
-Before starting to translate this part of the code we need to define a method to keep inside each node its neighbors, or rather, the other nodes with which every other node has a link. Python offers the set which is one of the 4 built-in data structures of python, the sets are unordered and non-indexed collections. They are perfectly suited for this type of task as the sets cannot contain two equal values. To implement this data structure we just need to insert a set attribute to our Node class. 
+Before starting to translate this part of the code we need to define an attribute to keep inside each node its neighbors, or rather, the other nodes with which every other node has a link. Python offers sets which is a built-in data structures, sets are unordered and non-indexed collections. They are perfectly suited for this type of task as the sets cannot contain two equal values. Also sets are very fast when you need to check for the presence or absence of an object inside them. but they have a disadvantage, they do not preserve the order of insertion, they are unordered. This can create some problems. Let's assume for example that we need to extract a random element from a set. to do this we use the function numpy.random.choice() which however accepts a list. When we transform our set into a list the order is not deterministic. This implies that by using the same seed in the random generator I will always have different draws. An explanation of why this occurs is beyond the scope of this tutorial. In case this keeps you up at night [here](https://www.youtube.com/watch?v=C4Kc8xzcA68) is a lengthy explanation. The solution is to assign a custom hash to our objects. Every object in python has a value that makes it unique, this value is created automatically when the object is instantiated and depends on the memory slot it occupies. This number that determines uniqueness in turn determines the position of this item within the list when the set is transformed. We can override this through the __hash__ attribute.
+We already assign a unique id to each node so the hash of our node might as well be deterministic. To implement this data structure we just need to insert a set attribute to our Node class and define a hash in this case the unique id of our node.
 
 ```python
 class Node(Agent):
 
     def __init__(self, model, unique_id):
         super().__init__(unique_id, model)
+        self.unique_id = unique_id
         self.neighbors = set()
-        .
-        .
+        # ......
+        # ......
+        # ......
+        
+    def __hash__(self):
+        return self.unique_id
 ```
 
-We also create a method within the Node class that allows us to add other nodes to the neighbors list. The links we will create are undirected i.e. if node1 is neighbor of node2 then node2 will also be neighbor of node1. [Notes on networks science.](https://mathinsight.org/network_introduction) The create_link_with function takes another node as argument and just adds the tow nodes in the respective neighbors sets, using the [Set.add()](https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset) built-in method
+We also create a method within the Node class that allows us to add other nodes to the neighbors list. The links we will create are undirected i.e. if node1 is neighbor of node2 then node2 will also be neighbor of node1. [Notes on networks science.](https://mathinsight.org/network_introduction) The create_link_with function takes another node as argument and just adds the tow nodes in the respective neighbors sets, using the [Set.add()](https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset) built-in method. We also add another method within the Node class, Node.get_distance(). We need a function that calculates the distance between two nodes. Without reinventing the wheel, the scipy library offers the spatial.distance module, inside this module we find the euclidean function that allows us to calculate the euclidean distance between two points. Import the library on top of our script as follow: `from scipy.spatial import distance`. 
 
 ```python
 def create_link_with(self, ego):
 	self.neighbors.add(ego)
 	ego.neighbors.add(self)
+    
+def get_distance(self, node):
+    return distance.euclidean((self.x,self.y), (node.x, node.y))
 ```
 
-Let's return to the procedures that define the spatially clustered network, we define a maximum number of nodes (num_links) and start a cycle of iterations using a while loop.  This loop will make as many interactions as the num_links, to calculate all the links we create at each iteration we access the scheduler we iterate between nodes and for each node we calculate how many neighbors it has, add everything up and divide by two.  We take an agent (from-agent) randomly using the numpy.default_rng instance and the choice() function. Now we need to find an agent that does not have a link with from_agent and is spatially the closest. To do this we need a function that calculates the distance between two agents. Without reinventing the wheel, the scipy library offers the spatial.distance module, inside this module we find the euclidean function that allows us to calculate the euclidean distance between two points. Consequently we import the library on top of our scipt as follow: `from scipy.spatial import distance`.
+Let's return to the procedures that define the spatially clustered network, we define a maximum number of nodes (num_links) and start a cycle of iterations using a while loop.  This loop will make as many interactions as the num_links, to calculate all the links we create at each iteration we access the scheduler we iterate between nodes and for each node we calculate how many neighbors it has, add everything up and divide by two.  We take an agent (`from_agent`) randomly using the numpy.random.default_rng instance and the choice() function. At this point we need to find another node that is not connected to `from_node` and is the closest one to `from_nodes`. In netlogo is: `(min-one-of (other turtles with [not link-neighbor? myself]) [distance myself])` In python we can use the min function, which accepts a key and we use the function we have built earlier. At this point we have the two nodes, all we have to do is connect them together. We add an `if` to check that  `to_node` exists and then we join them together with the method we built earlier.
 
 ```python
-num_links = (self.average_node_degree * self.number_of_nodes) / 2
-while sum([len(node.neighbors) for node in self.schedule.agents]) < num_links:
-    from_agent = self.rng.choice(self.schedule.agents)
+def setup_spatially_clustered_network(self):
+    num_links = (self.average_node_degree * self.number_of_nodes) / 2
+    while sum([len(node.neighbors) for node in self.schedule.agents]) / 2 < num_links:
+        from_node = self.random.choice(self.schedule.agents)
+        to_node = min([node for node in self.schedule.agents if node != from_node and node not in from_node.neighbors],
+                      key=lambda node: from_node.get_distance(node))
+        if to_node:
+            from_node.create_link_with(to_node)
 
 ```
 
+Our network is ready. Almost, we just need to add this method we created to the `setup` method of `VirusModel`.
+
+```python
+def setup(self):
+	self.setup_nodes()
+	self.setup_spatially_clustered_network()
+```
+
+To display it we add a small tweak to the `show_space` method we created earlier. We simply add another loop that draws the connection lines and change the colors slightly to make it easier to visualize. This also adds an option that shows infected nodes in red.
+
+```python
+def show_space(self):
+    fig, ax = plt.subplots()
+    for agent in self.schedule.agents:
+        ax.scatter(agent.x, 
+                   agent.y, 
+                   c="tab:red" if agent.infected else "tab:grey")
+        ax.annotate(agent.unique_id, 
+                    (agent.x + 0.2, agent.y + 0.2), 
+                    color="tab:purple")
+        if agent.neighbors:
+            for neighbor in agent.neighbors:
+                plt.plot((agent.x, neighbor.x),
+                         (agent.y, neighbor.y), "--",
+                         alpha=0.2,
+                         color="tab:orange",
+                         linewidth=1)
+                plt.show()
+```
+
+and then:
+
+```python
+if __name__ == "__main__":
+    model = VirusModel()
+    model.setup()
+    model.show_space()
+```
+
+If everything went as it should you will have something like this:
+
+![title](img/plot_2.png)
+
+##### Complete setup
+
+```
+to setup
+  clear-all
+  setup-nodes
+  setup-spatially-clustered-network
+  ask n-of initial-outbreak-size turtles
+    [ become-infected ]
+  ask links [ set color white ]
+  reset-ticks
+end
+```
+
+We have set up the nodes, we have created our spatially clustered network, to complete the setup we need to define an initial number of infected nodes. This in python is quite easy, we need to take a number of nodes equal to `ViusModel.initial_outbreak_size` randomly and set their `infected` attribute to `True`.
+
+```python
+def setup(self):
+	self.setup_nodes()
+    self.setup_spatially_clustered_network()
+    for agent in self.random.choice(self.schedule.agents,
+    								self.initial_outbreak_size):
+    	agent.infected = True
+```
+
+Setup completed! If you run the script again you should see the infected nodes:
+
+![title](img/plot_3.png)
+
+### Step 4, Go!
+
+```
+to go
+  if all? turtles [not infected?]
+    [ stop ]
+  ask turtles
+  [
+     set virus-check-timer virus-check-timer + 1
+     if virus-check-timer >= virus-check-frequency
+       [ set virus-check-timer 0 ]
+  ]
+  spread-virus
+  do-virus-checks
+  tick
+end
+```
