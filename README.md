@@ -19,7 +19,7 @@ As much as possible, there are endless ways to write a procedure in Python in th
 
 ## How to read this guide?
 
-
+In some places there are modeler tips with suggestions
 
 ------
 
@@ -122,6 +122,7 @@ To do this we add a new parameter, `seed`, to the init of VirusModel. In order t
 ```python
 import os
 import sys
+import numpy as np
 
 class VirusModel(Model):
 
@@ -136,9 +137,7 @@ If we want to reproduce two identical simulations we will just use the same seed
 
 When we create our Nodes we would need a place to store them, to solve this problem the mesa package offers us the mesa.time module. This module offers us 3 classes that we have to choose according to our modeling needs, we will not go into detail as they are perfectly explained on the [mesa.time module documentation.](https://mesa.readthedocs.io/en/master/apis/time.html) 
 
-For our model we will use the class mesa.time.BaseScheduler, the scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of Netlogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
-
-
+For our model we will use the class mesa.time.RandomActivation, the scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of Netlogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
 
 ```
 from mesa.time import RandomActivation
@@ -440,18 +439,289 @@ Setup completed! If you run the script again you should see the infected nodes:
 
 ### Step 4, Go!
 
+```cmake
+1 to go
+2   if all? turtles [not infected?]
+3    [ stop ]
+4  ask turtles
+5  [
+6     set virus-check-timer virus-check-timer + 1
+7     if virus-check-timer >= virus-check-frequency
+8       [ set virus-check-timer 0 ]
+9   ]
+10  spread-virus
+11  do-virus-checks
+12  tick
+13 end
 ```
-to go
-  if all? turtles [not infected?]
-    [ stop ]
-  ask turtles
-  [
-     set virus-check-timer virus-check-timer + 1
-     if virus-check-timer >= virus-check-frequency
-       [ set virus-check-timer 0 ]
-  ]
-  spread-virus
-  do-virus-checks
-  tick
+
+Summarizing this procedure does the following: 
+
+1. Check if there are infected nodes, if not the simulation is terminated. (2-3)
+2. Updates an internal clock for the agents that determines how often they are tested. (5-9)
+3. Activates the spread-virus procedure (10)
+4. Activates the do-virus-check procedure (11)
+5. Trigger tick (12)
+
+##### 1. End the simulation if there are no infected agents.
+
+Point 1, this one is easy. We add a step method inside the model. Then we create a list of all the `infected` attributes of all nodes (using a list comprehension) and check that they are all `False`, using the function `any()`. This built-in function returns `True` if within the list there is at least one `True`, otherwise it returns false, putting a `not` in front we will have exactly the opposite behavior, it returns `True` if all elements are `False`. if so, call `sys.exit()` that stops the execution of the script.
+
+```python
+def step(self):
+	if not any([agent.infected for agent in self.schedule.agents]):
+		sys.exit()
+```
+
+##### 2. Update the testing clock
+
+This can be done in various ways, here we will use the mesa scheduler for illustrative purposes. As we have said previously the mesa `RandomActivation` scheduler besides offering us a place and methods to add and remove agents also offers us a `step()` method that allows us to activate agents in a random order. This works in a very simple way and assumes that all agents within the scheduler have a method called `step`. This way when `scheduler.step()` is called, each agent will activate its `step()` method in random order. 
+
+```
+[
+	set virus-check-timer virus-check-timer + 1
+ 	if virus-check-timer >= virus-check-frequency
+ 		[ set virus-check-timer 0 ]
+]
+```
+
+Following the code in netlogo. This method increments the virus_check_timer attribute of the node by 1, if virus_check_timer is greater than or equal to the virus_check_frequency attribute of VirusModel then it is set to 0. We start by creating a step method within the Node class and implement the control.
+
+```python
+class Node(Agent):
+
+    def __init__(self, model, unique_id):
+        super().__init__(unique_id, model)
+        self.neighbors = set()
+        #
+        #
+        
+    def step(self):
+       self.virus_check_timer += 1
+       if self.virus_check_timer >= self.model.virus_check_frequency:
+           self.virus_check_timer = 0
+```
+
+After that inside the VirusModel class we add to the previously created step method self.schedule.step() that activates the step of all agents. 
+
+```python
+def step(self):
+	if not any([agent.infected for agent in self.schedule.agents]):
+		raise SystemExit
+	self.schedule.step()
+```
+
+**Modeler Tip**: Aggiungere qui i problemi del metodo step().
+
+##### 3. Spread the virus!
+
+```
+to spread-virus
+  ask turtles with [infected?]
+    [ ask link-neighbors with [not resistant?]
+        [ if random-float 100 < virus-spread-chance
+            [ become-infected ] ] ]
 end
 ```
+
+As usual, let's summarize what this procedure does. We randomly iterate among all infected nodes, for each node, we in turn iterate on all its neighbors that are not resistant to the virus. For each node we extract a random number from 0 to 100, if this number is less than virus-spread-chance then that node becomes infected. Let's implement it in python. We start by creating a new spread_virus method within the VirusModel class. We define a subset of infected nodes via a list comprehension as follow: `[node for node in                   self.schedule.agents if node.infected]`. Remember that the ask primitive takes nodes randomly, to ensure maximum comparability, we do the same thing in python. We can use the numpy.random.default_rng.permutation() function. This function performs a shuffle of the list that is passed and returns the shuffled element. At this point we iterate over each infected node, for each node we take its non-resistant neighbors and with another list comprehension we iterate over these.  After that we extract a number from 0 to 100 on a uniform distribution and compare it with the virus_spread_chance attribute of VirusModel. If the extracted number is less than virus_spread_chance, the node becomes infected, the virus has spread. 
+
+**Modeler Tip**: If you don't like a uniform distribution and want to customize your virus, [here](https://numpy.org/doc/stable/reference/random/generator.html) you'll find your bacteriological weapons, go easy on them!
+
+```python
+def spread_virus(self):
+    for inf_node in self.random.permutation([node for node in                   self.schedule.agents if
+                                          node.infected]):
+
+        for node in self.random.permutation([node for node in inf_node.neighbors if
+                                          not node.resistant]):
+
+            if self.random.uniform(0,100) < self.virus_spread_chance:
+                node.infected = True
+```
+
+To conclude we add this method to the step() of VirusModel:
+
+```python
+def step(self):
+	if not any([agent.infected for agent in self.schedule.agents]):
+		raise SystemExit
+	self.schedule.step()
+	self.spread_virus()
+```
+
+Test the virus spreads:
+
+```python
+if __name__ == "__main__":
+    model = VirusModel()
+    model.virus_spread_chance = 15
+    model.setup()
+    for a in range(10):
+        model.step()
+    model.show_space()
+```
+
+![title](img/plot_4.png)
+
+##### 4. Make them resistant!
+
+The virus is out of control, the nodes are not becoming resistant, yet!
+
+```
+to do-virus-checks
+  ask turtles with [infected? and virus-check-timer = 0]
+  [
+    if random 100 < recovery-chance
+    [
+      ifelse random 100 < gain-resistance-chance
+        [ become-resistant ]
+        [ become-susceptible ]
+    ]
+  ]
+end
+```
+
+This procedure iterates over all nodes that are infected and have reached the time of testing and gives them a chance to become resistant or susceptible again. we create again a method inside VirusModel and call it do_virus_check. This is pretty simple and I don't think it needs any further explanation. 
+
+```python
+def do_virus_check(self):
+    for inf_node in self.random.permutation([node for node in self.schedule.agents if
+                                             node.infected and node.virus_check_timer == 0]):
+        if self.random.uniform(0,100) < self.recovery_chance:
+            if self.random.uniform(0,100) < self.gain_resistence_chance:
+                inf_node.resistant = True
+                inf_node.infected = False
+            else:
+                inf_node.infected = False
+```
+
+We add the method to the step. To complete the step method we increase the tick by one. 
+
+```python
+def step(self):
+	if not any([agent.infected for agent in self.schedule.agents]):
+		raise SystemExit
+	self.schedule.step()
+	self.spread_virus()
+	self.do_virus_check()
+    self.tick += 1
+```
+
+Last thing, let's update the show_space method to show resistant nodes as well:
+
+```python
+def show_space(self):
+    fig, ax = plt.subplots()
+    for agent in self.schedule.agents:
+        ax.scatter(agent.x, agent.y, c= "tab:red" if agent.infected else (
+            "tab:green" if agent.resistant else "tab:grey"))
+        ax.annotate(agent.unique_id, (agent.x + 0.2, agent.y + 0.2), color="tab:purple")
+        if agent.neighbors:
+            for neighbor in agent.neighbors:
+                plt.plot((agent.x, neighbor.x),
+                         (agent.y, neighbor.y), "--",
+                         alpha=0.2,
+                         color="tab:orange",
+                         linewidth=1)
+                plt.show()
+```
+
+The step method is completed.
+
+### Step 5, make it more user-friendly
+
+Our model is ready, only a couple of final touches are missing: 
+
+1. some function to facilitate the use of the model
+2. a way to save the data
+4. a visualization
+
+##### 1. utility functions
+
+At this point every time we want to launch the model we must instantiate a `VirusModel()` object, call the `setup()` method and then loop and call the `step()` method every time. It would be easier to create a `run()` function that does all this for us don't you think? 
+
+In our run function we also want a way to signal to the user that the model is running correctly, even without a GUI. For this purpose we will use tqdm, a package to create simple progress bars. First install tqdm with this command: `pip install tqdm` and import it on top of the script `from tqdm import tqdm`.  The run function that we create takes 3 parameters: 
+
+**n_step:** this parameter takes as argument an integer number and defines the maximum number of model steps. Someone may ask, Can we set this to infinity? (since the simulation stops when there are no more infected nodes it might make sense). But it is not a good idea to put an infinite number of ticks, rather try to use a very large number as the maximum number. In case you want the simulation to run until there are no more infected nodes, you can change the run() function by adding a while loop instead of a for loop. In any case let's assign a default value to this parameter: 200 should be fine.
+
+**n_nodes:**  this parameter takes as argument an integer number and defines the number of nodes. If you remember we already assign the parameter `number_of_nodes` in the `__init__` of `VirusModel`, we want to continue to do so. So we put here a default parameter None, if nothing is passed the number assigned in the `__init__` of the model is used, otherwise we change `number_of_nodes` with the number we pass here. 
+
+**verbose:** this parameter is a mere switch that allows you to choose whether to show or not the progress bar. is useful when you want to run multiple simulations in parallel. Using a progress bar launching multiple simulations in parallel would make a visual mess in the console.
+
+```python
+def run(self, n_step=150, n_nodes=None, verbose=True):
+    if n_nodes is not None:
+        self.number_of_nodes = n_nodes
+        self.setup()
+        pbar = tqdm(np.arange(1, n_step + 1)) if verbose else range(1, n_step + 1)
+        for _tick in pbar:
+            self.step()
+            if verbose:
+                pbar.set_description("tick: %s" % _tick)
+                pbar.set_postfix({'infected': len([node for node in self.schedule.agents if
+                                                   node.infected])})
+```
+
+By adding this method to VirusModel you can launch the model like this:
+
+```python
+if __name__ == "__main__":
+    model = VirusModel()
+    model.run(n_nodes=1000, n_step=10000)
+```
+
+and you should see this in python console:
+
+```python
+tick: 1594:  15%|█▌        | 1508/10000 [00:08<00:17, 496.61it/s, infected=0]
+```
+
+##### 2. save the data
+
+To collect data mesa implements the `DataCollector` class. This class allows us to collect model and agent data and automatically generates a `pandas.DataFrame` when we ask for it. First we import the class at the top of the script: `from mesa.datacollection import DataCollector`. After that inside the `__init__` of `VirusModel` we create a new `collector` attribute, an instance of `DataColletor`. To the `__init__` of `DataCollector` we can pass 2 parameters: model_reporters and agent_reporters, in the form of a dictionary. The dictionary we pass must contain as many key-value pairs as we think necessary.  The key is a string that will represent the name of the column within the DataFrame that we will generate. The corresponding value can be a string or a lambda function. If it is a string this must be equal to an attribute of the model and the DataCollector will collect that attribute every time we call it. If it is a lambda function, the function determines what will be collected. Each time we call collector.collect(), the data is collected. So for now we want to collect the number of infected agents, the number of resistant agents, and the number of susceptible agents.
+
+```python
+self.collector = DataCollector(
+    model_reporters={
+     "infected": lambda x: len([node for node in x.schedule.agents if node.infected]),
+     "resistant": lambda x: len([node for node in x.schedule.agents if node.resistant]),
+     "susceptible": lambda x: len([node for node in x.schedule.agents if not
+                node.infected and not node.resistant])})
+```
+
+Now all we need to do is call collector.collect() at each step to collect the data or rather to activate the lambda functions and take the results.
+
+```python
+def step(self):
+    if not any([agent.infected for agent in self.schedule.agents]):
+        sys.exit()
+    self.schedule.step()
+    self.spread_virus()
+    self.do_virus_check()
+    self.collector.collect(self)
+    self.tick += 1
+```
+
+When the model finishes we also need to save the data to disk. By calling the get_model_vars_dataframe() method on the DataCollector instance we generate the pandas.DataFrame which can be saved in csv format by simply calling the to_csv() method and passing a path where to save.
+
+```python
+def dump_data(self, path, name):
+	self.collector.get_model_vars_dataframe().to_csv(os.path.join(path, name + ".csv"))
+	print("Saved!")
+```
+
+You can test saving in this way:
+
+```python
+if __name__ == "__main__":
+    model = VirusModel()
+    model.setup()
+    for a in range(100):
+        model.step()
+    model.dump_data(os.getcwd(), "sample_save")
+```
+
+##### 3. visualize it!
+
+![title](img/plot_5.gif)
