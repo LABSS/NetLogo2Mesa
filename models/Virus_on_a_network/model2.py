@@ -11,7 +11,6 @@ import sys
 from tqdm import tqdm
 import numpy as np
 from mesa.datacollection import DataCollector
-from matplotlib.pylab import *
 import matplotlib.animation as animation
 
 class VirusModel(Model):
@@ -123,18 +122,15 @@ class VirusModel(Model):
         print("Saved!")
 
 
-    def updateData(self, curr, infected, resistant, susceptible, tick):
+    def update_data(self, curr, infected, resistant, susceptible, tick):
         self.step()
-
         infected.append(len([node for node in self.schedule.agents if node.infected]))
         resistant.append(len([node for node in self.schedule.agents if node.resistant]))
         susceptible.append(len([node for node in self.schedule.agents
                                if not node.infected and not node.resistant]))
         tick.append(model.tick)
-
         for ax in (self.ax1, self.ax2, self.ax3):
             ax.clear()
-
         self.ax1.set_title("tick: " + str(self.tick))
         for agent in self.schedule.agents:
             self.ax1.scatter(agent.x, agent.y, c="tab:red" if agent.infected else (
@@ -155,24 +151,19 @@ class VirusModel(Model):
         self.ax3.plot(tick, resistant, c="green")
         self.ax4.plot(tick, susceptible, c="gray")
 
-
-
-    def visulize_run(self):
+    def visulize_run(self, n_nodes=None):
+        if n_nodes is not None:
+            self.number_of_nodes = n_nodes
         self.setup()
         self.fig = plt.figure()
         self.ax1 = self.fig.add_subplot(1, 2, 1)
         self.ax2 = self.fig.add_subplot(3, 2, 2)
         self.ax3 = self.fig.add_subplot(3, 2, 4)
         self.ax4 = self.fig.add_subplot(3, 2, 6)
-        infected = list()
-        resistant = list()
-        susceptible = list()
-        tick = list()
         self.simulation = animation.FuncAnimation(self.fig,
-                                                  self.updateData,
-                                                  fargs=(infected, resistant, susceptible, tick),
-                                                  interval=1000,
-                                                  repeat=False)
+                                                  self.update_data,
+                                                  fargs=(list(), list(), list(), list()),
+                                                  interval=200)
         self.fig.show()
 
 
@@ -209,50 +200,6 @@ class Node(Agent):
 
 if __name__ == "__main__":
     model = VirusModel()
-    model.number_of_nodes = 150
     model.initial_outbreak_size = 10
-    # model.setup()
-    model.visulize_run()
-
-    # def visulize_run():
-    #     model.setup()
-    #     fig = plt.figure()
-    #     ax1 = fig.add_subplot(1, 2, 1)
-    #     ax2 = fig.add_subplot(2, 2, 2)
-    #     ax3 = fig.add_subplot(2, 2, 4)
-    #     def updateData(curr, infected, resistant, tick):
-    #         model.step()
-    #         infected.append(len([node for node in model.schedule.agents if node.infected]))
-    #         resistant.append(len([node for node in model.schedule.agents if node.resistant]))
-    #         tick.append(model.tick)
-    #         for ax in (ax1, ax2, ax3):
-    #             ax.clear()
-    #
-    #         ax1.set_title("tick: " + str(model.tick))
-    #         for agent in model.schedule.agents:
-    #             ax1.scatter(agent.x, agent.y, c="tab:red" if agent.infected else (
-    #                 "tab:green" if agent.resistant else "tab:grey"))
-    #             ax1.annotate(agent.unique_id, (agent.x + 0.2, agent.y + 0.2), color="tab:purple")
-    #             if agent.neighbors:
-    #                 for neighbor in agent.neighbors:
-    #                     ax1.plot((agent.x, neighbor.x),
-    #                              (agent.y, neighbor.y), "--",
-    #                              alpha=0.2,
-    #                              color="tab:orange",
-    #                              linewidth=0.5)
-    #         ax2.plot(tick, infected, c = "red")
-    #         ax2.set_title("Infected")
-    #         ax3.set_title("Resistant")
-    #         ax3.plot(tick, resistant, c = "red")
-    #         plt.xticks(ha='right')
-    #     infected = list()
-    #     resistant = list()
-    #     tick = list()
-    #     simulation = animation.FuncAnimation(fig, updateData,
-    #                                          fargs=(infected, resistant, tick),
-    #                                          interval=1000,
-    #                                          repeat=False)
-    #     plt.show()
-    #
-    # # model.run(n_nodes=100, n_step=10000)
+    model.visulize_run(n_nodes=150)
 

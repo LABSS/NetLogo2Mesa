@@ -6,6 +6,10 @@
 
 
 
+
+
+
+
 ## What Python-tools should I use?
 
 In this little guide we will take a model written in [Netlogo](https://github.com/NetLogo/NetLogo) and we will transform it into a Python model. We will take the [NetLogo Virus on a Network model](https://ccl.northwestern.edu/netlogo/models/VirusonaNetwork) developed by Stonedahl and Wilensky in 2008, as example written in Netlogo. The model demonstrates the spread of a virus within a network, composed of nodes that can assume 3 states: **S**usceptible, **I**nfected, or **R**esistant. In the academic literature models of this type are called **SIR** models. Infected nodes can transmit the virus to their neighbors, susceptible nodes can be infected and resistant nodes cannot contract the virus. What happens at each temporal step we will see later. For now it is important to emphasize that in almost every Agent based model (from now ABM), including this one, there are two main phases: the setup, where we create our synthetic environment and the runtime, where the agents interact with each other. These two phases are clearly separable from each other even on an abstract level. 
@@ -281,7 +285,7 @@ In case you are short of motivation seeing something graphic might cheer you up.
 
 ```python
 import matplotlib
-matplotlib.use('Qt5Agg')
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 ```
 
@@ -724,4 +728,83 @@ if __name__ == "__main__":
 
 ##### 3. visualize it!
 
-![title](img/plot_5.gif)
+Based on the model you are building a visualization may or may not be necessary. visualizing data can be expensive, and may take resources that would otherwise be allocated to running the model. In any case, a visualization could always give you peace of mind during the development phase. And besides, you can impress your colleagues with magnificent color combinations. Whether or not you want to visualize the model, in this section we will outline a quick and easy way to graphically see that everything is going according to plan. 
+
+Mesa offers numerous modules to visualize your models. We won't be using them, for at least 4 reasons:
+
+1. We need to move away from Python, towards JavaScript, this is a tutorial in Python.
+2. They are already explained very well in the official mesa documentation.
+3. Customizing the visualization takes more effort than in python.
+4. There are no big advantages, in using mesa modules compared to a pythonic way.
+
+How does mesa visualization work? Mesa creates a webserver that communicates with the web browser through a local port (the client). The model runs inside the server and at each step it sends data (in json format) to the client that through javascript shows them on your browser. This approach has the advantage of providing great customization of the visualization, but you need to know javascript. By default, there are standard visualizations that allow you to not touch javascript, but they are relatively limited. An additional advantage is that the python interpreter only has to deal with running the model and sending the data to the browser. 
+
+Here we will use the most pythonic way, matplolib. Already used for the show_space function and is the standard in python for plotting things. What we're going to do is simply take the show_space function, add a few more pieces to it, and animate it. 
+
+The general idea here is to create 4 animated plots: one that shows us the same thing as show_space and 3 other plots that show us the number of susceptible, the number of infected and the number of resistant. First, we import the function that allows us to animate the plots: `import matplotlib.animation as animation`. After that we create a new method inside the VirusModel class: visualize_run. It will behave exactly like the VirusModel.run() method, but instead of showing a simple progress bar it will show a fantastic animated plot.  Then, following the run method we define a parameter n_nodes and give it a default value n_nodes and call the setup() method. Let's start with our figure, first, we instantiate it as a model attribute and add 4 sublots to it. When we add subplots to a figure we must specify the position through three arguments: (nrows, ncols, index). Quoting from [matplolib documentation](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplot.html): *"The subplot will take the index position on a grid with nrows rows and ncols columns. index starts at 1 in the upper left corner and increases to the right"*. This might seem strange the first time, but I assure you that with a couple of tries you will understand exactly what you are doing. At this point we create a new attribute of the VirusModel: `VirusModelsimulation`, and assign it an object of the class `matplotlib.animation.FuncAnimation()` that we imported at the beginning of the script. This class allows us to create an animated chart based on a function that updates the data at each step. The necessary arguments to pass are 3: a figure, a function that updates the data and a list of arguments to pass to the function. The figure is simple, you have already created one, let's pass it on. A function that updates the data, that we will create below and a number of initial arguments, 4 lists: one related to susceptible, one to infected, one to resistant and one related to tick.
+
+```python
+def visulize_run(self, n_nodes=None):
+    if n_nodes is not None:
+    	self.number_of_nodes = n_nodes
+	self.setup()
+	self.fig = plt.figure(figsize=(20,8))
+	self.ax1 = self.fig.add_subplot(1, 2, 1) # nrows, ncols, index 
+	self.ax2 = self.fig.add_subplot(3, 2, 2)
+	self.ax3 = self.fig.add_subplot(3, 2, 4)
+    self.ax4 = self.fig.add_subplot(3, 2, 6)
+	self.simulation = animation.FuncAnimation(self.fig, self.update_data,
+		fargs=(list(), 
+				list(), 
+				list(), 
+				list()))
+    
+	self.fig.show()
+```
+
+We create a new method `VirusModel.update_data()` and assign it 5 arguments, the first one is related to the FuncAnimation class, the other 4 are the lists that we will update with each tick. First, let's call the step method. Now in order to update the lists we have passed initially we will just have to calculate for each indicator a number and add it to the related list. After that we clean up the plots, which at this point will be the `tick-1` plots, and we redraw over everything. Then we draw the plot with the network on the axis we have previously instantiated and do the same with the other indicators.
+
+```python
+ def update_data(self, curr, infected, resistant, susceptible, tick):
+    self.step()
+    infected.append(len([node for node in self.schedule.agents 
+                         if node.infected]))
+    resistant.append(len([node for node in self.schedule.agents 
+                          if node.resistant]))
+    susceptible.append(len([node for node in self.schedule.agents
+           if not node.infected and not node.resistant]))
+    tick.append(model.tick)
+    
+    for ax in (self.ax1, self.ax2, self.ax3):
+        ax.clear()
+    for agent in self.schedule.agents:
+        self.ax1.scatter(agent.x, agent.y, c="tab:red" if agent.infected               else ("tab:green" if agent.resistant else "tab:grey"))
+        self.ax1.annotate(agent.unique_id, (agent.x + 0.2, agent.y + 0.2), color="tab:purple")
+        if agent.neighbors:
+            for neighbor in agent.neighbors:
+                self.ax1.plot((agent.x, neighbor.x),
+                              (agent.y, neighbor.y), "--",
+                              alpha=0.2,
+                              color="tab:orange",
+                              linewidth=0.5)
+                    
+	self.ax1.set_title("tick: " + str(self.tick))
+	self.ax2.set_title("Infected")
+	self.ax3.set_title("Resistant")
+	self.ax4.set_title("Susceptible")
+	self.ax2.plot(tick, infected, c="red")
+	self.ax3.plot(tick, resistant, c="green")
+	self.ax4.plot(tick, susceptible, c="gray")
+```
+
+At this point calling the visualize_run function you should see the aniamted plot.
+
+```python
+if __name__ == "__main__":
+    model = VirusModel()
+    model.initial_outbreak_size = 10
+    model.visulize_run(n_nodes=150)
+```
+
+<img src="img/plot_5.gif" width="800" height="300"/>
+
