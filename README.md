@@ -12,26 +12,26 @@ In this guide we will take a model written in [Netlogo](https://github.com/NetLo
 In case you want to get straight to the point, in the models folder you will find model.py, the ready-made model. As much as we care about this guide, summarizing all the knowledge on the topic is quite complex, in some places we kept it simple. In case you notice some important point that has not been touched, the issue section is open.
 
 ## Index:
-Netlogo2Mesa
-	1. Create the blueprints
-	2. Enhance Core classes
-		a. random
-		b. scheduler
-	3. Setup
-		a. setup-nodes
-		b. display nodes in space
-		c. setup-spatially-clustered-network
-		d. complete setup
-	4. Go!
-		a. stop the simulation if no infected nodes
-		b. update the testing clock
-		c. spread the virus!
-		d. make them resistant!
-	5. Make it scientist-friendly
-		a. utility functions
-		b. collect data
-		c. visualize it
-	6. Glossary
+  * [Netlogo2Mesa](#netlogo2mesa)
+    + [1. Create the blueprints](#1-create-the-blueprints)
+    + [2. Enhance Core classes](#2-enhance-core-classes)
+      - [Random](#random)
+      - [Scheduler](#scheduler)
+    + [3. Create the setup](#3-create-the-setup)
+      - [setup-nodes](#setup-nodes)
+      - [display the nodes in space](#display-the-nodes-in-space)
+      - [setup-spatially-clustered-network](#setup-spatially-clustered-network)
+      - [Complete setup](#complete-setup)
+    + [4. Go!](#4-go)
+      - [Stop the simulation if no infected nodes](#stop-the-simulation-if-no-infected-nodes)
+      - [Update the testing clock](#update-the-testing-clock)
+      - [Spread the virus!](#spread-the-virus)
+      - [Make them resistant!](#make-them-resistant)
+    + [Step 5, make it scientist-friendly](#step-5--make-it-scientist-friendly)
+      - [utility functions](#utility-functions)
+      - [save the data](#save-the-data)
+      - [visualize it!](#visualize-it)
+    + [Glosary](https://github.com/LABSS/NetLogo2Mesa/blob/master/Glossary.md)
 
 
 ## Netlogo2Mesa
