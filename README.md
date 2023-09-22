@@ -27,6 +27,7 @@ for x in self.schedule.agents if x.miscredent: x.believe()
 
 #let a [ shell ] of turtles with [ into-soup? ]
 a = [x.shell for x in self.schedule.agents if x.into-soup]
+```
 
 ### extractions
 
@@ -36,13 +37,13 @@ a = [x.shell for x in self.schedule.agents if x.into-soup]
 # let a n-of 10 turtles
 import random
 a = random.sample(a, 10)
-# 6.1.1 style
+# conversion accurate from netolog version 6.1.1 on; code before 6.1.1 would fail if len(a) < 10
 a = a if len(a) < 10 else random.sample(a,10)
 ```
 
 ### conversion of advanced structures
 
-There are some patterns I use a lot. Random extraction is one of them; in NetLogo, there's the really useful ```rnd:weighted_one_of``` construct that will appear again and again. A possible conversion pattern is as follows:
+There are some patterns I use a lot. Random extraction is one of them; in NetLogo, there's the really useful ```rnd:weighted_one_of``` construct. A possible conversion pattern is as follows:
 
 ```
 #let chosen rnd:weighted-one-of turtles [ holiness-weight ]
@@ -53,6 +54,10 @@ chosen = np.random.choice(self.schedule.agents,
 	replace=False)[0]
 ```
 
-Note that the ```replace=False``` makes little sense here, but helps when turning this into a pattern for ```rnd:weighted_n_of```, which is left as an exercise for the reader.
+Note that the ```replace=False``` makes little sense here, but helps when turning this into a pattern when we move from *one* to *n*, that is, to convert ```rnd:weighted_n_of```, which is left as an exercise for the reader.
+
+# Next: the tutorial
+
+Once you have understood the basic transfomation rules, you can continue with the tutorial in the *Tutorial.md* file, that will drive you step by step in the trasformation of netlogo code in Mesa-based python.
 
 
