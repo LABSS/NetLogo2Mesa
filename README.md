@@ -1,26 +1,30 @@
 # How to convert a model from NetLogo to mesa
 
-1. create class files
-2. convert variables using some RE expressions, in Sublime Text
-(
 ## Create conversion patterns
 
 ### conversion patterns for the big three instructions: ask, of, with.
+
+Let us assume that the agents are represented by the agentset `turtles` in NetLogo and by the list 'agents' in Python.
+
 
 1. *ask* pattern: ```ask turtles [ believe ]``` becomes:
 ```
 for x in self.schedule.agents: x.believe()
 ```
 
-1. *of* pattern: ```let a [ shell ] of turtles``` becomes, using list comprehension:
+For the next patterns we use *list comprehension* (https://en.wikipedia.org/wiki/List_comprehension).
+
+
+1. *of* pattern: ```let a [ shell ] of turtles``` becomes:
 ```
 [x.shell for x in self.schedule.agents]
 ```
 
-1. usage of *with* will depend on the main form (ask, of) and will just turn in a ```if``` construct:
+1. usage of *with* will depend on the main form (ask, of) and will just turn in a ```if``` construct, in one of the two following ways:
 ```
 #ask turtles with [ miscredent? ] [ believe ]
 for x in self.schedule.agents if x.miscredent: x.believe()
+
 #let a [ shell ] of turtles with [ into-soup? ]
 a = [x.shell for x in self.schedule.agents if x.into-soup]
 
@@ -34,6 +38,7 @@ import random
 a = random.sample(a, 10)
 # 6.1.1 style
 a = a if len(a) < 10 else random.sample(a,10)
+```
 
 ### conversion of advanced structures
 
@@ -42,8 +47,8 @@ There are some patterns I use a lot. Random extraction is one of them; in NetLog
 ```
 #let chosen rnd:weighted-one-of turtles [ holiness-weight ]
 import numpy as np
-chosen = np.random.choice(self.schedule.agents, 
-    p = [x.holiness_weight for x in self.schedule.agents], 
+chosen = np.random.choice(self.schedule.agents,
+    p = [x.holiness_weight for x in self.schedule.agents],
 	size.self.schedule.agents=1,
 	replace=False)[0]
 ```
