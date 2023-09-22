@@ -31,7 +31,7 @@ a = [x.shell for x in self.schedule.agents if x.into-soup]
 
 ### extractions
 
-1. ```n-of```
+1. ```n-of```, the first extraction pattern that is learned in Netlogo:
 
 ```
 # let a n-of 10 turtles
@@ -58,6 +58,6 @@ Note that the ```replace=False``` makes little sense here, but helps when turnin
 
 # Next: the tutorial
 
-Once you have understood the basic transfomation rules, you can continue with the tutorial in the *Tutorial.md* file, that will drive you step by step in the trasformation of netlogo code in Mesa-based python.
+Once you have understood the basic transfomation rules, you can continue with the [Tutorial](https://github.com/LABSS/NetLogo2Mesa/blob/return_original_README/Tutorial.md), that will drive you step by step in the trasformation of a netlogo model in Mesa-based python.
 
 
