@@ -58,6 +58,6 @@ Note that the ```replace=False``` makes little sense here, but helps when turnin
 
 # Next: the tutorial
 
-Once you have understood the basic transfomation rules, you can continue with the [Tutorial](https://github.com/LABSS/NetLogo2Mesa/blob/return_original_README/Tutorial.md), that will drive you step by step in the trasformation of a netlogo model in Mesa-based python.
+Once you have understood the basic transfomation rules, you can continue with the [Tutorial](https://github.com/LABSS/NetLogo2Mesa/blob/master/Tutorial.md), that will drive you step by step in the trasformation of a netlogo model in Mesa-based python.
 
 
