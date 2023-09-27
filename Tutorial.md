@@ -1,4 +1,4 @@
-# How to convert an agent based model from Netlogo to Python.
+# How to convert an agent based model from Netlogo to Python.XXXBO 
 
 ...and other stuff that will help you avoid headaches. 
 
@@ -161,7 +161,7 @@ How do we implement it? Easy, first thing first import the module `from numpy.ra
 1. By passing a seed as a parameter to VirusModel's init, numpy.random.default_rng() must use that seed.
 2. If no seed is passed, the model must generate one, save it and use that seed for the numpy.random.default_rng() instance.
 
-To do this we add a new parameter, `seed`, to the init of VirusModel. In order to implement behavior number 2, this parameter must take on a default value. We can use the os library and in particular the os.urandom() function to extract a string of bytes from our system. This function takes as parameter an integer, which represents the number of bytes of the string that is generated, 4 is more than enough. Also since it is a string of bytes we have to transform it into an integer using the sys library. 
+To do this we add a new parameter, `seed`, to the __init__ of VirusModel. In order to implement behavior number 2, this parameter must take on a default value. We can use the os library and in particular the os.urandom() function to extract a string of bytes from our system. This function takes as parameter an integer, which represents the number of bytes of the string that is generated, 8 is more than enough. Also since it is a string of bytes we have to transform it into an integer using the sys library. 
 
 ```python
 import os
@@ -170,7 +170,7 @@ import numpy as np
 
 class VirusModel(Model):
 
-    def __init__(self, number_of_nodes=150, seed=int.from_bytes(os.urandom(4), sys.byteorder)):
+    def __init__(self, number_of_nodes=150, seed=int.from_bytes(os.urandom(8), sys.byteorder)):
         self.seed = seed
         self.random = default_rng(self.seed)
 ```
