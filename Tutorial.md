@@ -4,15 +4,15 @@
 
 ## What is this guide about?
 
-In this guide we will take a model written in [Netlogo](https://github.com/NetLogo/NetLogo) and we will transform it into a Python model step by step.  We will take the [NetLogo Virus on a Network model](https://ccl.northwestern.edu/netlogo/models/VirusonaNetwork) developed by Stonedahl and Wilensky in 2008, as sample written in Netlogo. The model demonstrates the spread of a virus within a network, composed of nodes that can assume 3 states: **S**usceptible, **I**nfected, or **R**esistant (SIR). Infected nodes can transmit the virus to their neighbors, susceptible nodes can be infected and resistant nodes cannot contract the virus. This guide examines the MESA package, a popular agent-based modeling framework written in Python. We wrote this guide trying to be as clear as possible and following the mantra of the popular subreddit eli5 (Explain Like I'm Five). The python implementation of each procedure follows this outline:
-1. What the code does in Netlogo
+In this guide we will take a model written in [NetLogo](https://github.com/NetLogo/NetLogo) and we will transform it into a Python model step by step.  We will take the [NetLogo Virus on a Network model](https://ccl.northwestern.edu/netlogo/models/VirusonaNetwork) developed by Stonedahl and Wilensky in 2008, as sample written in NetLogo. The model demonstrates the spread of a virus within a network, composed of nodes that can assume 3 states: **S**usceptible, **I**nfected, or **R**esistant (SIR). Infected nodes can transmit the virus to their neighbors, susceptible nodes can be infected and resistant nodes cannot contract the virus. This guide examines the MESA package, a popular agent-based modeling framework written in Python. We wrote this guide trying to be as clear as possible and following the mantra of the popular subreddit eli5 (Explain Like I'm Five). The python implementation of each procedure follows this outline:
+1. What the code does in NetLogo
 2. The explanation of the translation process step by step
 3. The code translated into python
 
 In case you want to get straight to the point, in the models folder you will find model.py, the ready-made model. As much as we care about this guide, summarizing all the knowledge on the topic is quite complex, in some places we kept it simple. In case you notice some important point that has not been touched, the issue section is open.
 
 ## Index:
-  * [Netlogo2Mesa](#netlogo2mesa)
+  * [NetLogo2Mesa](#netlogo2mesa)
     + [1. Create the blueprints](#1-create-the-blueprints)
     + [2. Enhance Core classes](#2-enhance-core-classes)
       - [Random](#random)
@@ -34,11 +34,11 @@ In case you want to get straight to the point, in the models folder you will fin
     + [Glosary](https://github.com/LABSS/NetLogo2Mesa/blob/master/Glossary.md)
 
 
-## Netlogo2Mesa
+## NetLogo2Mesa
 
 ### 1. Create the blueprints
 
-At a high level of abstraction the model we are going to create can be defined as a single object, a python-class. We can call this class **VirusModel**. This object has its **attributes** such as the number of agents or nodes and its **methods**, the procedures specific to our model, such as the algorithm that generates the network. In python each object has its own `__init__` method, this method is called every time a new **VirusModel** object is instantiated, it is good practice to define here all the attributes of our model (e.g. here is where we define all the variables that in Netlogo are under the name [globals](http://ccl.northwestern.edu/netlogo/docs/dict/globals.html)). The first attribute we define is `VirusModel.number_of_nodes` which simply represents the number of nodes. We don't want a fixed number of nodes so  insert as parameter of the `__init__` the keyword `number_of_nodes` specify the type `int`, and give it a default value of 150. In this way every time a new **VirusModel** object is instantiated we can define a number of nodes, if we don't do it `VirusModel.number_of_nodes` will be equal to default value.  Now it's time to introduce the global attributes, including those that in Netlogo are stored in the graphical interface, and give them a default value. These are: `gain-resistance-chance`, `recovery-chance`, `virus-spread-chance`, `virus-check-frequency`, `initial-outbreak-size`, `average-node-degree`. We also define the size of the graphic space, in netlogo this information is contained in the Interface section or by opening the .nlogo file with a text editor in the `GRAPHICS-WINDOW` section. From here we can see that the width of the space goes from -20 to 20 and the height from -20 to 20, in python for simplicity we will say that the `ViruslModel.space_width = 40` and `ViruslModel.space_heigh = 40`. So our space will go from 0 to 40 in the x-axis and y-axis. We want a model that has style, so we name our model object using the special `__repr__` method, every time we print an instance of  **VirusModel** this method is called. 
+At a high level of abstraction the model we are going to create can be defined as a single object, a python-class. We can call this class **VirusModel**. This object has its **attributes** such as the number of agents or nodes and its **methods**, the procedures specific to our model, such as the algorithm that generates the network. In python each object has its own `__init__` method, this method is called every time a new **VirusModel** object is instantiated, it is good practice to define here all the attributes of our model (e.g. here is where we define all the variables that in NetLogo are under the name [globals](http://ccl.northwestern.edu/netlogo/docs/dict/globals.html)). The first attribute we define is `VirusModel.number_of_nodes` which simply represents the number of nodes. We don't want a fixed number of nodes so  insert as parameter of the `__init__` the keyword `number_of_nodes` specify the type `int`, and give it a default value of 150. In this way every time a new **VirusModel** object is instantiated we can define a number of nodes, if we don't do it `VirusModel.number_of_nodes` will be equal to default value.  Now it's time to introduce the global attributes, including those that in NetLogo are stored in the graphical interface, and give them a default value. These are: `gain-resistance-chance`, `recovery-chance`, `virus-spread-chance`, `virus-check-frequency`, `initial-outbreak-size`, `average-node-degree`. We also define the size of the graphic space, in NetLogo this information is contained in the Interface section or by opening the .nlogo file with a text editor in the `GRAPHICS-WINDOW` section. From here we can see that the width of the space goes from -20 to 20 and the height from -20 to 20, in python for simplicity we will say that the `ViruslModel.space_width = 40` and `ViruslModel.space_heigh = 40`. So our space will go from 0 to 40 in the x-axis and y-axis. We want a model that has style, so we name our model object using the special `__repr__` method, every time we print an instance of  **VirusModel** this method is called. 
 
 ```python
 class VirusModel():
@@ -59,7 +59,7 @@ class VirusModel():
         return "Virus Model"
 ```
 
-We have our simple **VirusModel**, now it is time to create nodes, the agents of our model. Create the Node class and define the special `__init__` method, here we will insert the attributes of each agent. The attributes of agents in a Netlogo model are contained within the primitive turtle-related `<breeds>-own`. In the example model nodes have these properties: 
+We have our simple **VirusModel**, now it is time to create nodes, the agents of our model. Create the Node class and define the special `__init__` method, here we will insert the attributes of each agent. The attributes of agents in a NetLogo model are contained within the primitive turtle-related `<breeds>-own`. In the example model nodes have these properties: 
 
 ```
 turtles-own
@@ -253,7 +253,7 @@ if __name__ == "__main__":
 
 ### 3. Create the setup
 
-We have our blueprint now is the time to implement the procedures that organize the initial status of the model or simply everything in Netlogo is included in the "setup" procedure. 
+We have our blueprint now is the time to implement the procedures that organize the initial status of the model or simply everything in NetLogo is included in the "setup" procedure. 
 
 ##### What does the Virus on a network Model setup do?
 
@@ -261,7 +261,7 @@ The setup starts by generating all the necessary nodes (number-of-nodes) and giv
 
 We will analyze and translate into python procedure by procedure:
 
-```Netlogo
+```NetLogo
 to setup
   clear-all
   setup-nodes
@@ -291,7 +291,7 @@ to setup-nodes
 end
 ```
 
-In netlogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands, in python we can emulate this behavior with a simple for cycle. Inside the model define a new setup-nodes method, implement a simple for loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. 
+In NetLogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands, in python we can emulate this behavior with a simple for cycle. Inside the model define a new setup-nodes method, implement a simple for loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. 
 
 ```python
 def setup_nodes(self):
@@ -303,7 +303,7 @@ def setup(self):
 	self.setup_nodes()
 ```
 
-Remember that every time a new Node is instantiated the special `__init__` method is executed, this means that we can specify the initial properties of each Node within the `__init__` of the Node and not within setup_nodes. To define the random coordinates of each node we just use the default_rng instance we created inside the model and called VirusModel.random the [numpy.random.default_rng.integers](https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.integers.html#numpy.random.Generator.integers) function returns an integer in a given range in this case we want an integer from 0 to VirusModel.space_width for the x and from 0 to VirusModel.space_height for the y. We have our random coordinates for each Node, now we give it an initial state, defined in Netlogo by the become-susceptible procedure that simply sets infected to False and resistant to False. and finally we set a virus-check-timer represented by a integer random from 0 to virus-check-frequency. 
+Remember that every time a new Node is instantiated the special `__init__` method is executed, this means that we can specify the initial properties of each Node within the `__init__` of the Node and not within setup_nodes. To define the random coordinates of each node we just use the default_rng instance we created inside the model and called VirusModel.random the [numpy.random.default_rng.integers](https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.integers.html#numpy.random.Generator.integers) function returns an integer in a given range in this case we want an integer from 0 to VirusModel.space_width for the x and from 0 to VirusModel.space_height for the y. We have our random coordinates for each Node, now we give it an initial state, defined in NetLogo by the become-susceptible procedure that simply sets infected to False and resistant to False. and finally we set a virus-check-timer represented by a integer random from 0 to virus-check-frequency. 
 
 ```python
 class Node(Agent):
@@ -349,7 +349,7 @@ Et voilà, our nodes!
 
 #### setup-spatially-clustered-network
 
-```netlogo
+```NetLogo
 to setup-spatially-clustered-network
   let num-links (average-node-degree * number-of-nodes) / 2
   while [count links < num-links ]
@@ -364,7 +364,7 @@ to setup-spatially-clustered-network
 end
 ```
 
-There are many ways to create a spatially clustered nework, for completeness in this guide we will follow the same algorithm used in netlogo example code. The method that is used follows this procedure: It iterates for as many times as  a maximum number of links (num-links), when maximum is reached the procedure stops. Each iteration takes a random node and based on this a further node is taken that has no link with the first one and is the closest of all the other nodes. If there is a node with these characteristics these two nodes are connected. 
+There are many ways to create a spatially clustered nework, for completeness in this guide we will follow the same algorithm used in NetLogo example code. The method that is used follows this procedure: It iterates for as many times as  a maximum number of links (num-links), when maximum is reached the procedure stops. Each iteration takes a random node and based on this a further node is taken that has no link with the first one and is the closest of all the other nodes. If there is a node with these characteristics these two nodes are connected. 
 
 Before starting to translate this part of the code we need to define an attribute to keep inside each node its neighbors, or rather, the other nodes with which every other node has a link. Python offers sets which is a built-in data structures, sets are unordered and non-indexed collections. They are perfectly suited for this type of task as the sets cannot contain two equal values. Also sets are very fast when you need to check for the presence or absence of an object inside them. but they have a disadvantage, they do not preserve the order of insertion, they are unordered. This can create some problems. Let's assume for example that we need to extract a random element from a set. to do this we use the function numpy.random.choice() which however accepts a list. When we transform our set into a list the order is not deterministic. This implies that by using the same seed in the random generator will always have different draws. An explanation of why this occurs is beyond the scope of this tutorial. In case this keeps you up at night [here](https://www.youtube.com/watch?v=C4Kc8xzcA68) is a lengthy explanation. The solution is to assign a custom hash to our objects. Every object in python has a value that makes it unique, this value is created automatically when the object is instantiated and depends on the memory slot it occupies. This number that determines uniqueness in turn determines the position of this item within the list when the set is transformed. We can override this through the __hash__ attribute.
 
@@ -396,7 +396,7 @@ def get_distance(self, node):
     return distance.euclidean((self.x, self.y), (node.x, node.y))
 ```
 
-Let's return to the procedures that define the spatially clustered network, we define a maximum number of nodes (num_links) and start a cycle of iterations using a while loop.  This loop will make as many interactions as the num_links, to calculate all the links we create at each iteration we access the scheduler we iterate between nodes and for each node we calculate how many neighbors it has, add everything up and divide by two.  We take an agent (`from_agent`) randomly using the numpy.random.default_rng instance and the choice() function. At this point we need to find another node that is not connected to `from_node` and is the closest one to `from_nodes`. In netlogo is: `(min-one-of (other turtles with [not link-neighbor? myself]) [distance myself])` In python we can use the min function, which accepts a key and we use the function we have built earlier. At this point we have the two nodes, all we have to do is connect them together. We add an `if` to check that  `to_node` exists and then we join them together with the method we built earlier.
+Let's return to the procedures that define the spatially clustered network, we define a maximum number of nodes (num_links) and start a cycle of iterations using a while loop.  This loop will make as many interactions as the num_links, to calculate all the links we create at each iteration we access the scheduler we iterate between nodes and for each node we calculate how many neighbors it has, add everything up and divide by two.  We take an agent (`from_agent`) randomly using the numpy.random.default_rng instance and the choice() function. At this point we need to find another node that is not connected to `from_node` and is the closest one to `from_nodes`. In NetLogo is: `(min-one-of (other turtles with [not link-neighbor? myself]) [distance myself])` In python we can use the min function, which accepts a key and we use the function we have built earlier. At this point we have the two nodes, all we have to do is connect them together. We add an `if` to check that  `to_node` exists and then we join them together with the method we built earlier.
 
 ```python
 def setup_spatially_clustered_network(self):
@@ -529,7 +529,7 @@ This can be done in various ways, here we will use the mesa scheduler for illust
 ]
 ```
 
-Following the code in netlogo. This method increments the virus_check_timer attribute of the node by 1, if virus_check_timer is greater than or equal to the virus_check_frequency attribute of VirusModel then it is set to 0. We start by creating a step method within the Node class and implement the control.
+Following the code in NetLogo. This method increments the virus_check_timer attribute of the node by 1, if virus_check_timer is greater than or equal to the virus_check_frequency attribute of VirusModel then it is set to 0. We start by creating a step method within the Node class and implement the control.
 
 ```python
 class Node(Agent):
