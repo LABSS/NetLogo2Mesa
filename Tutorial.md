@@ -4,7 +4,7 @@
 
 ## What is this guide about?
 
-In this guide we will take a model written in [NetLogo](https://github.com/NetLogo/NetLogo) and we will transform it into a Python model step by step.  We will take the [NetLogo Virus on a Network model](https://ccl.northwestern.edu/netlogo/models/VirusonaNetwork) developed by Stonedahl and Wilensky in 2008, as sample written in NetLogo. The model demonstrates the spread of a virus within a network, composed of nodes that can assume 3 states: **S**usceptible, **I**nfected, or **R**esistant (SIR). Infected nodes can transmit the virus to their neighbors, susceptible nodes can be infected and resistant nodes cannot contract the virus. This guide examines the MESA package, a popular agent-based modeling framework written in Python. We wrote this guide trying to be as clear as possible and following the mantra of the popular subreddit eli5 (Explain Like I'm Five). The python implementation of each procedure follows this outline:
+In this guide we will take a model written in [NetLogo](https://github.com/NetLogo/NetLogo) and we will transform it into a Python model step by step.  We will take the [NetLogo Virus on a Network model](https://ccl.northwestern.edu/netlogo/models/VirusonaNetwork) developed by Stonedahl and Wilensky in 2008, as sample written in NetLogo. The model demonstrates the spread of a virus within a network, composed of nodes that can assume 3 states: **S**usceptible, **I**nfected, or **R**esistant (SIR). Infected nodes can transmit the virus to their neighbors, susceptible nodes can be infected and resistant nodes cannot contract the virus. This guide examines the Mesa package, a popular agent-based modeling framework written in Python. We wrote this guide trying to be as clear as possible and following the mantra of the popular subreddit eli5 (Explain Like I'm Five). The python implementation of each procedure follows this outline:
 1. What the code does in NetLogo
 2. The explanation of the translation process step by step
 3. The code translated into python
@@ -127,7 +127,7 @@ class Node():
 
 ### 2. Enhance Core classes
 
-Before we go to write the procedures of our model and our agents, we must have a machine that has the necessary functionality. The mesa package gives us some interesting tools to enhance our model, which otherwise were to be implemented from scratch. The [two basic mesa modules](https://mesa.readthedocs.io/en/master/apis/init.html) are mesa.agent and mesa.model, these modules give us the basic mesa.model.Model and mesa.agent.Agent classes. These two classes, have their methods and attributes that we want to implement within our VirusModel (our model) and Node (our agents). In Python this mechanism is implementable through inheritance, when we create a new class, passing as parameter an existing class, the new class will inherit all methods and attributes. 
+Before we go to write the procedures of our model and our agents, we must have a machine that has the necessary functionality. The Mesa package gives us some interesting tools to enhance our model, which otherwise were to be implemented from scratch. The [two basic Mesa modules](https://mesa.readthedocs.io/en/master/apis/init.html) are mesa.agent and mesa.model, these modules give us the basic mesa.model.Model and mesa.agent.Agent classes. These two classes, have their methods and attributes that we want to implement within our VirusModel (our model) and Node (our agents). In Python this mechanism is implementable through inheritance, when we create a new class, passing as parameter an existing class, the new class will inherit all methods and attributes. 
 
 ```python
 from mesa.model import Model
@@ -179,7 +179,7 @@ If we want to reproduce two identical simulations we will just use the same seed
 
 #### Scheduler
 
-When we create our Nodes we would need a place to store them, to solve this problem the mesa package offers us the mesa.time module. This module offers 3 classes that we have to choose according to our modeling needs, we will not go into detail as they are perfectly explained on the [mesa.time module documentation.](https://mesa.readthedocs.io/en/master/apis/time.html) 
+When we create our Nodes we would need a place to store them, to solve this problem the Mesa package offers us the mesa.time module. This module offers 3 classes that we have to choose according to our modeling needs, we will not go into detail as they are perfectly explained on the [mesa.time module documentation.](https://mesa.readthedocs.io/en/master/apis/time.html) 
 
 For our model we will use the class mesa.time.RandomActivation, the scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of Netlogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
 
@@ -519,7 +519,7 @@ def step(self):
 
 #### Update the testing clock
 
-This can be done in various ways, here we will use the mesa scheduler for illustrative purposes. As we have said previously the mesa `RandomActivation` scheduler besides offering us a place and methods to add and remove agents also offers us a `step()` method that allows us to activate agents in a random order. This works in a very simple way and assumes that all agents within the scheduler have a method called `step`. This way when `scheduler.step()` is called, each agent will activate its `step()` method in random order. 
+This can be done in various ways, here we will use the Mesa scheduler for illustrative purposes. As we have said previously the Mesa `RandomActivation` scheduler besides offering us a place and methods to add and remove agents also offers us a `step()` method that allows us to activate agents in a random order. This works in a very simple way and assumes that all agents within the scheduler have a method called `step`. This way when `scheduler.step()` is called, each agent will activate its `step()` method in random order. 
 
 ```
 [
@@ -721,7 +721,7 @@ tick: 1594:  15%|█▌        | 1508/10000 [00:08<00:17, 496.61it/s, infected=0
 
 #### save the data
 
-To collect data mesa implements the `DataCollector` class. This class allows us to collect model and agent data and automatically generates a `pandas.DataFrame` when we ask for it. First we import the class at the top of the script: `from mesa.datacollection import DataCollector`. After that inside the `__init__` of `VirusModel` we create a new `collector` attribute, an instance of `DataColletor`. To the `__init__` of `DataCollector` we can pass 2 parameters: model_reporters and agent_reporters, in the form of a dictionary. The dictionary we pass must contain as many key-value pairs as we think necessary.  The key is a string that will represent the name of the column within the DataFrame that we will generate. The corresponding value can be a string or a lambda function. If it is a string this must be equal to an attribute of the model and the DataCollector will collect that attribute every time we call it. If it is a lambda function, the function determines what will be collected. Each time we call collector.collect(), the data is collected. So for now we want to collect the number of infected agents, the number of resistant agents, and the number of susceptible agents.
+To collect data, Mesa implements the `DataCollector` class. This class allows us to collect model and agent data and automatically generates a `pandas.DataFrame` when we ask for it. First we import the class at the top of the script: `from mesa.datacollection import DataCollector`. After that inside the `__init__` of `VirusModel` we create a new `collector` attribute, an instance of `DataColletor`. To the `__init__` of `DataCollector` we can pass 2 parameters: model_reporters and agent_reporters, in the form of a dictionary. The dictionary we pass must contain as many key-value pairs as we think necessary.  The key is a string that will represent the name of the column within the DataFrame that we will generate. The corresponding value can be a string or a lambda function. If it is a string this must be equal to an attribute of the model and the DataCollector will collect that attribute every time we call it. If it is a lambda function, the function determines what will be collected. Each time we call collector.collect(), the data is collected. So for now we want to collect the number of infected agents, the number of resistant agents, and the number of susceptible agents.
 
 ```python
 self.collector = DataCollector(
@@ -771,11 +771,11 @@ Based on the model you are building a visualization may or may not be necessary.
 Mesa offers numerous modules to visualize your models. We won't be using them, for at least 4 reasons:
 
 1. We need to move away from Python, towards JavaScript, this is a tutorial in Python.
-2. They are already explained very well in the official mesa documentation.
+2. They are already explained very well in the official Mesa documentation.
 3. Customizing the visualization takes more effort than in python.
-4. There are no big advantages, in using mesa modules compared to a pythonic way.
+4. There are no big advantages, in using Mesa modules compared to a pythonic way.
 
-How does mesa visualization work? Mesa creates a webserver that communicates with the web browser through a local port (the client). The model runs inside the server and at each step it sends data (in json format) to the client that through javascript shows them on your browser. This approach has the advantage of providing great customization of the visualization, but you need to know javascript. By default, there are standard visualizations that allow you to not touch javascript, but they are relatively limited. An additional advantage is that the python interpreter only has to deal with running the model and sending the data to the browser. 
+How does Mesa visualization work? Mesa creates a webserver that communicates with the web browser through a local port (the client). The model runs inside the server and at each step it sends data (in json format) to the client that through javascript shows them on your browser. This approach has the advantage of providing great customization of the visualization, but you need to know javascript. By default, there are standard visualizations that allow you to not touch javascript, but they are relatively limited. An additional advantage is that the python interpreter only has to deal with running the model and sending the data to the browser. 
 
 Here we will use the most pythonic way, matplolib. Already used for the show_space function and is the standard in python for plotting things. What we're going to do is simply take the show_space function, add a few more pieces to it, and animate it. 
 
