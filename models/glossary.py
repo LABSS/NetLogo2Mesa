@@ -1,4 +1,4 @@
-``` python
+```python
 from numpy.random import default_rng
 
 
