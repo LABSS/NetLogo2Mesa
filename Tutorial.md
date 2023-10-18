@@ -208,7 +208,7 @@ import time
 
 class VirusModel(Model):
 
-    def __init__(self, number_of_nodes=150, seed=int(time.time() % 60)):
+    def __init__(self, number_of_nodes=150, seed=int.from_bytes(os.urandom(8), sys.byteorder)):
         super().__init__(seed=seed)
         self.seed = seed
         self.tick = 0
