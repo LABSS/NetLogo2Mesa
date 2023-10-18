@@ -1,4 +1,3 @@
-```python
 from numpy.random import default_rng
 
 
@@ -25,11 +24,11 @@ class Agent:
 if __name__ == '__main__':
     model = Model()
     model.create_agents()
-```
 
 
-1. *with*: reports a new agentset containing only those agents that reported true, the agents satisfying the given condition.
     """
+    with:
+    Reports a new agentset containing only those agents that reported true, the agents satisfying the given condition.
     show count patches with [pcolor = red]
     """
     print(len([agent for agent in model.agentset if agent.color == "red"]))
