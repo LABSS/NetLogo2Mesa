@@ -1,4 +1,4 @@
-# How to convert a model from NetLogo to mesa
+# How to convert a model from NetLogo to Mesa
 
 ## Create conversion patterns
 
