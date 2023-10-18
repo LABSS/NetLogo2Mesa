@@ -29,36 +29,9 @@ if __name__ == '__main__':
     model.create_agents()
 ```
 
+### Big three instructions ask, of, with
 
-
-### with
-
-"Reports a new agentset containing only those agents that reported true, the agents satisfying the given condition." [source](http://ccl.northwestern.edu/netlogo/docs/dict/with.html)
-
-```netlogo
-show count patches with [pcolor = red]
-```
-
-```python
-print(len([agent for agent in model.agentset if agent.color == "red"]))
-```
-
-### of
-
-"For an agent, reports the value of the reporter for that agent (turtle or patch). For an agentset, reports a list that contains the value of the reporter for each agent in the agentset (in random order)." [source](http://ccl.northwestern.edu/netlogo/docs/dict/of.html)
-
-```
-show [pxcor] of patch 3 5
-```
-
-```python
-print(model.agentset[1].color)
-print(model.random.permuted([agent.color for agent in model.agentset]))
-```
-
-### ask
-
-"The specified agent or agentset runs the given commands."  [source](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html)
+1. *ask*: "The specified agent or agentset runs the given commands."  [source](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html)
 
 ```
 ask patches [ set pcolor red ]
@@ -70,8 +43,30 @@ for agent in model.random.permuted(model.agentset):
     print(agent, agent.color)
 ```
 
-### n-of
-"Reports an agentset of size size randomly chosen from the input set, with no repeats." [source](http://ccl.northwestern.edu/netlogo/docs/dict/n-of.html)
+2. *of*: "For an agent, reports the value of the reporter for that agent (turtle or patch). For an agentset, reports a list that contains the value of the reporter for each agent in the agentset (in random order)." [source](http://ccl.northwestern.edu/netlogo/docs/dict/of.html)
+
+```
+show [pxcor] of patch 3 5
+```
+
+```python
+print(model.agentset[1].color)
+print(model.random.permuted([agent.color for agent in model.agentset]))
+```
+
+
+3. *with*: "Reports a new agentset containing only those agents that reported true, the agents satisfying the given condition." [source](http://ccl.northwestern.edu/netlogo/docs/dict/with.html)
+
+```netlogo
+show count patches with [pcolor = red]
+```
+
+```python
+print(len([agent for agent in model.agentset if agent.color == "red"]))
+```
+### Extractions
+
+1. *n-of*: "Reports an agentset of size size randomly chosen from the input set, with no repeats." [source](http://ccl.northwestern.edu/netlogo/docs/dict/n-of.html)
 
 ```
 ask n-of 50 patches [ set pcolor green ]
