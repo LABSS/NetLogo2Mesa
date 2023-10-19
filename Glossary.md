@@ -29,9 +29,9 @@ if __name__ == '__main__':
     model.create_agents()
 ```
 
-### with
+### Big three instructions: ask, of, with
 
-"Reports a new agentset containing only those agents that reported true, the agents satisfying the given condition." [source](http://ccl.northwestern.edu/netlogo/docs/dict/with.html)
+1. *with*: "Reports a new agentset containing only those agents that reported true, the agents satisfying the given condition." [source](http://ccl.northwestern.edu/netlogo/docs/dict/with.html)
 
 ```netlogo
 show count patches with [pcolor = red]
@@ -41,9 +41,7 @@ show count patches with [pcolor = red]
 print(len([agent for agent in model.agentset if agent.color == "red"]))
 ```
 
-### of
-
-"For an agent, reports the value of the reporter for that agent (turtle or patch). For an agentset, reports a list that contains the value of the reporter for each agent in the agentset (in random order)." [source](http://ccl.northwestern.edu/netlogo/docs/dict/of.html)
+2. *of*: "For an agent, reports the value of the reporter for that agent (turtle or patch). For an agentset, reports a list that contains the value of the reporter for each agent in the agentset (in random order)." [source](http://ccl.northwestern.edu/netlogo/docs/dict/of.html)
 
 ```
 show [pxcor] of patch 3 5
@@ -54,9 +52,7 @@ print(model.agentset[1].color)
 print(model.random.permuted([agent.color for agent in model.agentset]))
 ```
 
-### ask
-
-"The specified agent or agentset runs the given commands."  [source](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html)
+3. *ask*: "The specified agent or agentset runs the given commands."  [source](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html)
 
 ```
 ask patches [ set pcolor red ]
@@ -68,8 +64,9 @@ for agent in model.random.permuted(model.agentset):
     print(agent, agent.color)
 ```
 
-### n-of
-"Reports an agentset of size size randomly chosen from the input set, with no repeats." [source](http://ccl.northwestern.edu/netlogo/docs/dict/n-of.html)
+### Extractions
+
+1. *n-of*: "Reports an agentset of size size randomly chosen from the input set, with no repeats." [source](http://ccl.northwestern.edu/netlogo/docs/dict/n-of.html)
 
 ```
 ask n-of 50 patches [ set pcolor green ]
