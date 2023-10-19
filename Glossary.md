@@ -29,7 +29,7 @@ if __name__ == '__main__':
     model.create_agents()
 ```
 
-### withh
+### with
 
 "Reports a new agentset containing only those agents that reported true, the agents satisfying the given condition." [source](http://ccl.northwestern.edu/netlogo/docs/dict/with.html)
 
