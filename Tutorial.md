@@ -200,7 +200,6 @@ from mesa.model import Model
 from mesa.agent import Agent
 from mesa.time import RandomActivation
 from numpy.random import default_rng
-import time
 
 
 class VirusModel(Model):
