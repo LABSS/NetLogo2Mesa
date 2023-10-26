@@ -15,12 +15,12 @@ for x in self.schedule.agents: x.believe()
 For the next patterns we use *list comprehension* (https://en.wikipedia.org/wiki/List_comprehension).
 
 
-1. *of* pattern: ```let a [ shell ] of turtles``` becomes:
+2. *of* pattern: ```let a [ shell ] of turtles``` becomes:
 ```
 [x.shell for x in self.schedule.agents]
 ```
 
-1. usage of *with* will depend on the main form (ask, of) and will just turn in a ```if``` construct, in one of the two following ways:
+3. usage of *with* will depend on the main form (ask, of) and will just turn in a ```if``` construct, in one of the two following ways:
 ```
 #ask turtles with [ miscredent? ] [ believe ]
 for x in self.schedule.agents if x.miscredent: x.believe()
