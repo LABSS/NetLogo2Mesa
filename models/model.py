@@ -6,7 +6,6 @@ from mesa.time import RandomActivation
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-import time
 from scipy.spatial import distance
 import os
 import sys
