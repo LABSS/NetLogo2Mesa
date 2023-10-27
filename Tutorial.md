@@ -532,7 +532,7 @@ This can be done in various ways, here we will use the Mesa scheduler for illust
 ]
 ```
 
-Following the code in NetLogo. This method increments the virus_check_timer attribute of the node by 1, if virus_check_timer is greater than or equal to the virus_check_frequency attribute of VirusModel then it is set to 0. We start by creating a step method within the Node class and implement the control.
+Following the code in NetLogo, this method increments the virus_check_timer attribute of the node by 1, if virus_check_timer is greater than or equal to the virus_check_frequency attribute of VirusModel then it is set to 0. We start by creating a step method within the Node class and implement the control.
 
 ```python
 class Node(Agent):
