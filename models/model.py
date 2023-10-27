@@ -21,8 +21,8 @@ class VirusModel(Model):
         self.tick = 0
         self.random = np.random.default_rng(self.seed)
         self.schedule = RandomActivation(self)
-        self.space_width = 41
-        self.space_height = 41
+        self.space_width = 40
+        self.space_height = 40
         self.number_of_nodes = number_of_nodes
         self.gain_resistence_chance = 5.0
         self.recovery_chance = 5.0
