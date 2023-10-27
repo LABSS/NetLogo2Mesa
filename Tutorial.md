@@ -769,7 +769,7 @@ if __name__ == "__main__":
 
 #### visualize it!
 
-Based on the model you are building a visualization may or may not be necessary. visualizing data can be expensive, and may take resources that would otherwise be allocated to running the model. In any case, a visualization could always give you peace of mind during the development phase. And besides, you can impress your colleagues with magnificent color combinations. Whether or not you want to visualize the model, in this section we will outline a quick and easy way to graphically see that everything is going according to plan. 
+Based on the model you are building a visualization may or may not be necessary. Visualizing data can be expensive, and may take resources that would otherwise be allocated to running the model. In any case, a visualization could always give you peace of mind during the development phase. And besides, you can impress your colleagues with magnificent color combinations. Whether or not you want to visualize the model, in this section we will outline a quick and easy way to graphically see that everything is going according to plan. 
 
 Mesa offers numerous modules to visualize your models. We won't be using them, for at least 4 reasons:
 
