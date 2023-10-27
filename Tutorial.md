@@ -254,7 +254,7 @@ if __name__ == "__main__":
 
 ### 3. Create the setup
 
-We have our blueprint now is the time to implement the procedures that organize the initial status of the model or simply everything in NetLogo is included in the "setup" procedure. 
+Now that we have our blueprint, it is time to implement the procedures that organize the initial status of the model or simply everything that in NetLogo is included in the "setup" procedure. 
 
 ##### What does the Virus on a network Model setup do?
 
