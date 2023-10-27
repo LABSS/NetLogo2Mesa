@@ -549,7 +549,7 @@ class Node(Agent):
            self.virus_check_timer = 0
 ```
 
-After that inside the VirusModel class we add to the previously created step method self.schedule.step() that activates the step of all agents. 
+After that, inside the VirusModel class we add to the previously created step method self.schedule.step() that activates the step of all agents. 
 
 ```python
 def step(self):
