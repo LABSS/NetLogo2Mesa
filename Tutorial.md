@@ -803,7 +803,7 @@ def visulize_run(self, n_nodes=None):
 	self.fig.show()
 ```
 
-We create a new method `VirusModel.update_data()` and assign it 5 arguments, the first one is related to the FuncAnimation class, the other 4 are the lists that we will update with each tick. First, let's call the step method. Now in order to update the lists we have passed initially we will just have to calculate for each indicator a number and add it to the related list. After that we clean up the plots, which at this point will be the `tick-1` plots, and we redraw over everything. Then we draw the plot with the network on the axis we have previously instantiated and do the same with the other indicators.
+We create a new method `VirusModel.update_data()` and assign it 5 arguments, the first one is related to the FuncAnimation class, the other 4 are the lists that we will update with each tick. First, let's call the step method. Now, in order to update the lists we have passed initially, we will just have to calculate for each indicator a number and add it to the related list. After that we clean up the plots, which at this point will be the `tick-1` plots, and we redraw over everything. Then we draw the plot with the network on the axis we have previously instantiated and do the same with the other indicators.
 
 ```python
  def update_data(self, curr, infected, resistant, susceptible, tick):
