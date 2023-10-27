@@ -293,7 +293,7 @@ to setup-nodes
 end
 ```
 
-In NetLogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands, in Python we can emulate this behavior with a simple for cycle. Inside the model define a new setup-nodes method, implement a simple for loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. 
+In NetLogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands, in Python we can emulate this behavior with a simple `for` cycle. Inside the model, we define a new setup-nodes method and implement a simple for loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. 
 
 ```python
 def setup_nodes(self):
