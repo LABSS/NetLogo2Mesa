@@ -692,7 +692,7 @@ In our run function we also want a way to signal to the user that the model is r
 
 **n_nodes:**  this parameter takes as argument an integer number and defines the number of nodes. If you remember we already assign the parameter `number_of_nodes` in the `__init__` of `VirusModel`, we want to continue to do so. So we put here a default parameter None, if nothing is passed the number assigned in the `__init__` of the model is used, otherwise we change `number_of_nodes` with the number we pass here. 
 
-**verbose:** this parameter is a mere switch that allows you to choose whether to show or not the progress bar. is useful when you want to run multiple simulations in parallel. Using a progress bar launching multiple simulations in parallel would make a visual mess in the console.
+**verbose:** this parameter is a mere switch that allows you to choose whether to show or not the progress bar. It is useful when you want to run multiple simulations in parallel. Using a progress bar launching multiple simulations in parallel would make a visual mess in the console.
 
 ```python
 def run(self, n_step=150, n_nodes=None, verbose=True):
