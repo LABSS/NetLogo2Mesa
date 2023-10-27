@@ -1,4 +1,4 @@
-# How to convert an agent based model from Netlogo to Python. 
+# How to convert an agent based model from NetLogo to Python. 
 
 ...and other stuff that will help you avoid headaches. 
 
