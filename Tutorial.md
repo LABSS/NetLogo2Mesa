@@ -179,7 +179,8 @@ If we want to reproduce two identical simulations we will just use the same seed
 
 #### Scheduler
 
-When we create our Nodes we would need a place to store them, to solve this problem the Mesa package offers us the mesa.time module. This module offers 3 classes that we have to choose according to our modeling needs, we will not go into detail as they are perfectly explained on the [mesa.time module documentation.](https://mesa.readthedocs.io/en/master/apis/time.html) 
+When we create our Nodes we would need a place to store them. To solve this problem the Mesa package offers us the mesa.time module.
+This module offers 3 classes that we have to choose according to our modeling needs, we will not go into detail as they are perfectly explained on the [mesa.time module documentation.](https://mesa.readthedocs.io/en/master/apis/time.html) 
 
 For our model we will use the class mesa.time.RandomActivation, the scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of Netlogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
 
@@ -253,11 +254,12 @@ if __name__ == "__main__":
 
 ### 3. Create the setup
 
-We have our blueprint now is the time to implement the procedures that organize the initial status of the model or simply everything in NetLogo is included in the "setup" procedure. 
+Now that we have our blueprint, it is time to implement the procedures that organize the initial status of the model or simply everything that in NetLogo is included in the "setup" procedure. 
 
 ##### What does the Virus on a network Model setup do?
 
-The setup starts by generating all the necessary nodes (number-of-nodes) and gives it 3 fundamental properties: a position on space (defined by an x and y), an initial state (S) and a value for virus-check-timer. If we visualize our space at this point we will see many points stochastically positioned on a space. The next step is to join these points creating a network, the algorithm that performs this process is very simple, it defines a maximum number of nodes that depends on average-node-degree and number-of-nodes, starts a cycle of iterations that ends when the total number of links will be greater than the maximum number of links. Each iteration a random node is taken and linked to another node nearby, as long as these two do not already have a link. Finally, a number of nodes equal to initial-outbreak-size is set to infected.
+The setup starts by generating all the necessary nodes (number-of-nodes) and gives it 3 fundamental properties: a position on space (defined by an x and y), an initial state (S) and a value for virus-check-timer. If we visualize our space at this point we will see many points stochastically positioned on a space.
+The next step is to join these points creating a network. The algorithm that performs this process is very simple, it defines a maximum number of nodes that depends on average-node-degree and number-of-nodes, starts a cycle of iterations that ends when the total number of links will be greater than the maximum number of links. Each iteration, a random node is taken and linked to another node nearby, as long as these two do not already have a link. Finally, a number of nodes equal to initial-outbreak-size is set to infected.
 
 We will analyze and translate into Python procedure by procedure:
 
@@ -291,7 +293,7 @@ to setup-nodes
 end
 ```
 
-In NetLogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands, in Python we can emulate this behavior with a simple for cycle. Inside the model define a new setup-nodes method, implement a simple for loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. 
+In NetLogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands, in Python we can emulate this behavior with a simple `for` cycle. Inside the model, we define a new setup-nodes method and implement a simple for loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. 
 
 ```python
 def setup_nodes(self):
@@ -321,7 +323,7 @@ class Node(Agent):
 
 #### display the nodes in space
 
-In case you are short of motivation seeing something graphic might cheer you up. For this visualization we will use matplolib, first thing then import the package. 
+In case you are short of motivation, seeing something graphic might cheer you up. For this visualization we will use matplolib, first thing then import the package. 
 
 ```python
 import matplotlib
@@ -329,7 +331,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 ```
 
-To show the points we will use a simple scatterplot using the  [matplotlib.pyplot.scatter](https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.scatter.html) function that takes two basic parameters a series of x and a series of y. The first number of the x series will correspond to the x of the first node and the same for the y series. We must then generate two sets of numbers one that will contain all the x of each node and the other that will contain all the y of each node. Inside the model we create a new method, show_space, and we collect the x's and y's through a [list comprehension](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions). We don't want to see a space with useless dots, so we also take the unique_id of each node so we can print it next to each dot. Then we instantiate a new figure, create a scatter and insert labels at each point.
+To show the points we will use a simple scatterplot using the  [matplotlib.pyplot.scatter](https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.scatter.html) function that takes two basic parameters: a series of x and a series of y. The first number of the x series will correspond to the x of the first node and the same for the y series. We must then generate two sets of numbers one that will contain all the x of each node and the other that will contain all the y of each node. Inside the model we create a new method, show_space, and we collect the x's and y's through a [list comprehension](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions). We don't want to see a space with useless dots, so we also take the unique_id of each node so we can print it next to each dot. Then we instantiate a new figure, create a scatter and insert labels at each point.
 
 ```python
 def show_space(self):
@@ -366,7 +368,8 @@ end
 
 There are many ways to create a spatially clustered nework, for completeness in this guide we will follow the same algorithm used in NetLogo example code. The method that is used follows this procedure: It iterates for as many times as  a maximum number of links (num-links), when maximum is reached the procedure stops. Each iteration takes a random node and based on this a further node is taken that has no link with the first one and is the closest of all the other nodes. If there is a node with these characteristics these two nodes are connected. 
 
-Before starting to translate this part of the code we need to define an attribute to keep inside each node its neighbors, or rather, the other nodes with which every other node has a link. Python offers sets which is a built-in data structures, sets are unordered and non-indexed collections. They are perfectly suited for this type of task as the sets cannot contain two equal values. Also sets are very fast when you need to check for the presence or absence of an object inside them. but they have a disadvantage, they do not preserve the order of insertion, they are unordered. This can create some problems. Let's assume for example that we need to extract a random element from a set. to do this we use the function numpy.random.choice() which however accepts a list. When we transform our set into a list the order is not deterministic. This implies that by using the same seed in the random generator will always have different draws. An explanation of why this occurs is beyond the scope of this tutorial. In case this keeps you up at night [here](https://www.youtube.com/watch?v=C4Kc8xzcA68) is a lengthy explanation. The solution is to assign a custom hash to our objects. Every object in Python has a value that makes it unique, this value is created automatically when the object is instantiated and depends on the memory slot it occupies. This number that determines uniqueness in turn determines the position of this item within the list when the set is transformed. We can override this through the __hash__ attribute.
+Before starting to translate this part of the code we need to define an attribute to keep inside each node its neighbors, or rather, the other nodes with which every other node has a link. Python offers sets which is a built-in data structures, sets are unordered and non-indexed collections. They are perfectly suited for this type of task as the sets cannot contain two equal values. Also sets are very fast when you need to check for the presence or absence of an object inside them. but they have a disadvantage, they do not preserve the order of insertion, they are unordered. This can create some problems. Let's assume for example that we need to extract a random element from a set. to do this we use the function numpy.random.choice() which however accepts a list. When we transform our set into a list the order is not deterministic. This implies that by using the same seed in the random generator will always have different draws. An explanation of why this occurs is beyond the scope of this tutorial. In case this keeps you up at night [here](https://www.youtube.com/watch?v=C4Kc8xzcA68) is a lengthy explanation. The solution is to assign a custom hash to our objects. Every object in Python has a value that makes it unique, this value is created automatically when the object is instantiated and depends on the memory slot it occupies. This number that determines uniqueness in turn determines the position of this item within the list when the set is transformed.
+We can override this through the `__hash__` attribute.
 
 We already assign a unique id to each node so the hash of our node might as well be deterministic. To implement this data structure we just need to insert a set attribute to our Node class and define a hash in this case the unique id of our node.
 
@@ -529,7 +532,7 @@ This can be done in various ways, here we will use the Mesa scheduler for illust
 ]
 ```
 
-Following the code in NetLogo. This method increments the virus_check_timer attribute of the node by 1, if virus_check_timer is greater than or equal to the virus_check_frequency attribute of VirusModel then it is set to 0. We start by creating a step method within the Node class and implement the control.
+Following the code in NetLogo, this method increments the virus_check_timer attribute of the node by 1, if virus_check_timer is greater than or equal to the virus_check_frequency attribute of VirusModel then it is set to 0. We start by creating a step method within the Node class and implement the control.
 
 ```python
 class Node(Agent):
@@ -546,7 +549,7 @@ class Node(Agent):
            self.virus_check_timer = 0
 ```
 
-After that inside the VirusModel class we add to the previously created step method self.schedule.step() that activates the step of all agents. 
+After that, inside the VirusModel class we add to the previously created step method self.schedule.step() that activates the step of all agents. 
 
 ```python
 def step(self):
@@ -689,7 +692,7 @@ In our run function we also want a way to signal to the user that the model is r
 
 **n_nodes:**  this parameter takes as argument an integer number and defines the number of nodes. If you remember we already assign the parameter `number_of_nodes` in the `__init__` of `VirusModel`, we want to continue to do so. So we put here a default parameter None, if nothing is passed the number assigned in the `__init__` of the model is used, otherwise we change `number_of_nodes` with the number we pass here. 
 
-**verbose:** this parameter is a mere switch that allows you to choose whether to show or not the progress bar. is useful when you want to run multiple simulations in parallel. Using a progress bar launching multiple simulations in parallel would make a visual mess in the console.
+**verbose:** this parameter is a mere switch that allows you to choose whether to show or not the progress bar. It is useful when you want to run multiple simulations in parallel. Using a progress bar launching multiple simulations in parallel would make a visual mess in the console.
 
 ```python
 def run(self, n_step=150, n_nodes=None, verbose=True):
@@ -766,7 +769,7 @@ if __name__ == "__main__":
 
 #### visualize it!
 
-Based on the model you are building a visualization may or may not be necessary. visualizing data can be expensive, and may take resources that would otherwise be allocated to running the model. In any case, a visualization could always give you peace of mind during the development phase. And besides, you can impress your colleagues with magnificent color combinations. Whether or not you want to visualize the model, in this section we will outline a quick and easy way to graphically see that everything is going according to plan. 
+Based on the model you are building a visualization may or may not be necessary. Visualizing data can be expensive, and may take resources that would otherwise be allocated to running the model. In any case, a visualization could always give you peace of mind during the development phase. And besides, you can impress your colleagues with magnificent color combinations. Whether or not you want to visualize the model, in this section we will outline a quick and easy way to graphically see that everything is going according to plan. 
 
 Mesa offers numerous modules to visualize your models. We won't be using them, for at least 4 reasons:
 
@@ -800,7 +803,7 @@ def visulize_run(self, n_nodes=None):
 	self.fig.show()
 ```
 
-We create a new method `VirusModel.update_data()` and assign it 5 arguments, the first one is related to the FuncAnimation class, the other 4 are the lists that we will update with each tick. First, let's call the step method. Now in order to update the lists we have passed initially we will just have to calculate for each indicator a number and add it to the related list. After that we clean up the plots, which at this point will be the `tick-1` plots, and we redraw over everything. Then we draw the plot with the network on the axis we have previously instantiated and do the same with the other indicators.
+We create a new method `VirusModel.update_data()` and assign it 5 arguments, the first one is related to the FuncAnimation class, the other 4 are the lists that we will update with each tick. First, let's call the step method. Now, in order to update the lists we have passed initially, we will just have to calculate for each indicator a number and add it to the related list. After that we clean up the plots, which at this point will be the `tick-1` plots, and we redraw over everything. Then we draw the plot with the network on the axis we have previously instantiated and do the same with the other indicators.
 
 ```python
  def update_data(self, curr, infected, resistant, susceptible, tick):
