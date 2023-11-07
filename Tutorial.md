@@ -504,8 +504,8 @@ Setup completed! If you run the script again you should see the infected nodes:
 
 Summarizing this procedure does the following: 
 
-1. Check if there are infected nodes, if not the simulation is terminated. (2-3)
-2. Updates an internal clock for the agents that determines how often they are tested. (5-9)
+1. Check if there are infected nodes, if not the simulation is terminated (2-3)
+2. Updates an internal clock for the agents that determines how often they are tested (5-9)
 3. Activates the spread-virus procedure (10)
 4. Activates the do-virus-check procedure (11)
 5. Trigger tick (12)
