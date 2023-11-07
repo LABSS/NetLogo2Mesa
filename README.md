@@ -37,7 +37,7 @@ a = [x.shell for x in self.schedule.agents if x.into-soup]
 # let a n-of 10 turtles
 import random
 a = random.sample(a, 10)
-# conversion accurate from netolog version 6.1.1 on; code before 6.1.1 would fail if len(a) < 10
+# conversion accurate from NetLogo version 6.1.1 on; code before 6.1.1 would fail if len(a) < 10
 a = a if len(a) < 10 else random.sample(a,10)
 ```
 
