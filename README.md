@@ -43,7 +43,7 @@ a = a if len(a) < 10 else random.sample(a,10)
 
 ### conversion of advanced structures
 
-There are some patterns I use a lot. Random extraction is one of them; in NetLogo, there's the really useful ```rnd:weighted_one_of``` construct. A possible conversion pattern is as follows:
+There are some patterns we use a lot. Random extraction is one of them; in NetLogo, there's the really useful ```rnd:weighted_one_of``` construct. A possible conversion pattern is as follows:
 
 ```
 #let chosen rnd:weighted-one-of turtles [ holiness-weight ]
