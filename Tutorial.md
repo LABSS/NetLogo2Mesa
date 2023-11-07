@@ -146,7 +146,7 @@ The `super().__init__(parameters)` function also allows you to inherit the param
 
 #### Random
 
-The mesa.model.Model class gives us a fundamental functionality for an ABM: a random generator. When we instantiate a VirusModel object the pyhton interpreter executes the special `__new__` method of the mesa.model.Model class, this method instantiates for us a [random.Random](https://docs.python.org/3/library/random.html) object, and since the child class inherits all the attributes of the parent class, we can access this attribute from the VirusModel object. You can test this generator by simply instantiating a VirusModel object, accessing the random attribute and then the random.Random.random() method, this method will return a random float between 0 and 1.
+The mesa.model.Model class gives us a fundamental functionality for an ABM: a random generator. When we instantiate a VirusModel object the Pyhton interpreter executes the special `__new__` method of the mesa.model.Model class, this method instantiates for us a [random.Random](https://docs.python.org/3/library/random.html) object, and since the child class inherits all the attributes of the parent class, we can access this attribute from the VirusModel object. You can test this generator by simply instantiating a VirusModel object, accessing the random attribute and then the random.Random.random() method, this method will return a random float between 0 and 1.
 
 ```python
 if __name__ == "__main__":
