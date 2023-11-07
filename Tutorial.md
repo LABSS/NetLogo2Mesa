@@ -277,7 +277,7 @@ end
 
 #### setup-nodes
 
-Let's skip the primitive [clear-all](http://ccl.northwestern.edu/netlogo/docs/dict/clear-all.html), in Python we don't need this, simply every time we want to create a new model we create another instance of VirusModel.
+Let's skip the primitive [clear-all](http://ccl.northwestern.edu/netlogo/docs/dict/clear-all.html). In Python we don't need this, simply every time we want to create a new model we create another instance of VirusModel.
 
 The  procedure setup-nodes defines a default form for all agents, a circle, then generates as many agents as required by the number-of-nodes parameter and assigns to each one an x value and a random y value on a plane activates the become-susceptible procedure and assigns a random value to the virus-check-timer attribute.
 
