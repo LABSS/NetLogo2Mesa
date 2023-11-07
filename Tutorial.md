@@ -469,7 +469,7 @@ to setup
 end
 ```
 
-We have set up the nodes, we have created our spatially clustered network, to complete the setup we need to define an initial number of infected nodes. This in Python is quite easy, we need to take a number of nodes equal to `ViusModel.initial_outbreak_size` randomly and set their `infected` attribute to `True`.
+We have set up the nodes, we have created our spatially clustered network, to complete the setup we need to define an initial number of infected nodes. This in Python is quite easy, we need to take a number of nodes equal to `VirusModel.initial_outbreak_size` randomly and set their `infected` attribute to `True`.
 
 ```python
 def setup(self):
