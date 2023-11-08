@@ -1,4 +1,4 @@
-# How to convert a model from NetLogo to mesa
+# How to convert a model from NetLogo to Mesa
 
 ## Create conversion patterns
 
@@ -31,19 +31,19 @@ a = [x.shell for x in self.schedule.agents if x.into-soup]
 
 ### extractions
 
-1. ```n-of```, the first extraction pattern that is learned in Netlogo:
+1. ```n-of```, the first extraction pattern that is learned in NetLogo:
 
 ```
 # let a n-of 10 turtles
 import random
 a = random.sample(a, 10)
-# conversion accurate from netolog version 6.1.1 on; code before 6.1.1 would fail if len(a) < 10
+# conversion accurate from NetLogo version 6.1.1 on; code before 6.1.1 would fail if len(a) < 10
 a = a if len(a) < 10 else random.sample(a,10)
 ```
 
 ### conversion of advanced structures
 
-There are some patterns I use a lot. Random extraction is one of them; in NetLogo, there's the really useful ```rnd:weighted_one_of``` construct. A possible conversion pattern is as follows:
+There are some patterns we use a lot. Random extraction is one of them; in NetLogo, there's the really useful ```rnd:weighted_one_of``` construct. A possible conversion pattern is as follows:
 
 ```
 #let chosen rnd:weighted-one-of turtles [ holiness-weight ]
@@ -58,6 +58,6 @@ Note that the ```replace=False``` makes little sense here, but helps when turnin
 
 # Next: the tutorial
 
-Once you have understood the basic transfomation rules, you can continue with the [Tutorial](https://github.com/LABSS/NetLogo2Mesa/blob/master/Tutorial.md), that will drive you step by step in the trasformation of a netlogo model in Mesa-based python.
+Once you have understood the basic transfomation rules, you can continue with the [Tutorial](https://github.com/LABSS/NetLogo2Mesa/blob/master/Tutorial.md), that will drive you step by step in the trasformation of a NetLogo model in Mesa-based python.
 
 
