@@ -1,4 +1,4 @@
-# How to convert an agent based model from NetLogo to Python. 
+# How to convert an agent-based model from NetLogo to Python. 
 
 ...and other stuff that will help you avoid headaches. 
 
@@ -38,7 +38,7 @@ In case you want to get straight to the point, in the models folder you will fin
 
 ### 1. Create the blueprints
 
-At a high level of abstraction the model we are going to create can be defined as a single object, a python-class. We can call this class **VirusModel**. This object has its **attributes** such as the number of agents or nodes and its **methods**, the procedures specific to our model, such as the algorithm that generates the network. In Python each object has its own `__init__` method, this method is called every time a new **VirusModel** object is instantiated, it is good practice to define here all the attributes of our model (e.g. here is where we define all the variables that in NetLogo are under the name [globals](http://ccl.northwestern.edu/netlogo/docs/dict/globals.html)). The first attribute we define is `VirusModel.number_of_nodes` which simply represents the number of nodes. We don't want a fixed number of nodes so  insert as parameter of the `__init__` the keyword `number_of_nodes` specify the type `int`, and give it a default value of 150. In this way every time a new **VirusModel** object is instantiated we can define a number of nodes, if we don't do it `VirusModel.number_of_nodes` will be equal to default value.  Now it's time to introduce the global attributes, including those that in NetLogo are stored in the graphical interface, and give them a default value. These are: `gain-resistance-chance`, `recovery-chance`, `virus-spread-chance`, `virus-check-frequency`, `initial-outbreak-size`, `average-node-degree`. We also define the size of the graphic space, in NetLogo this information is contained in the Interface section or by opening the .nlogo file with a text editor in the `GRAPHICS-WINDOW` section. From here we can see that the width of the space goes from -20 to 20 and the height from -20 to 20, in Python for simplicity we will say that the `ViruslModel.space_width = 40` and `ViruslModel.space_heigh = 40`. So our space will go from 0 to 40 in the x-axis and y-axis. We want a model that has style, so we name our model object using the special `__repr__` method, every time we print an instance of  **VirusModel** this method is called. 
+At a high level of abstraction the model we are going to create can be defined as a single object, a python-class. We can call this class **VirusModel**. This object has its **attributes** such as the number of agents or nodes and its **methods**, the procedures specific to our model, such as the algorithm that generates the network. In Python each object has its own `__init__` method, this method is called every time a new **VirusModel** object is instantiated, it is good practice to define here all the attributes of our model (e.g. here is where we define all the variables that in NetLogo are under the name [globals](http://ccl.northwestern.edu/netlogo/docs/dict/globals.html)). The first attribute we define is `VirusModel.number_of_nodes` which simply represents the number of nodes. We don't want a fixed number of nodes so  insert as parameter of the `__init__` the keyword `number_of_nodes` specify the type `int`, and give it a default value of 150. In this way every time a new **VirusModel** object is instantiated we can define a number of nodes, if we don't do it `VirusModel.number_of_nodes` will be equal to default value.  Now it's time to introduce the global attributes, including those that in NetLogo are stored in the graphical interface, and give them a default value. These are: `gain-resistance-chance`, `recovery-chance`, `virus-spread-chance`, `virus-check-frequency`, `initial-outbreak-size`, `average-node-degree`. We also define the size of the graphic space. In NetLogo this information is contained in the Interface section or by opening the .nlogo file with a text editor in the `GRAPHICS-WINDOW` section. From here we can see that the width of the space goes from -20 to 20 and the height from -20 to 20, in Python for simplicity we will say that the `VirusModel.space_width = 40` and `VirusModel.space_heigh = 40`. So our space will go from 0 to 40 in the x-axis and y-axis. We want a model that has style, so we name our model object using the special `__repr__` method, every time we print an instance of  **VirusModel** this method is called. 
 
 ```python
 class VirusModel():
@@ -146,7 +146,7 @@ The `super().__init__(parameters)` function also allows you to inherit the param
 
 #### Random
 
-The mesa.model.Model class gives us a fundamental functionality for an ABM: a random generator. When we instantiate a VirusModel object the pyhton interpreter executes the special `__new__` method of the mesa.model.Model class, this method instantiates for us a [random.Random](https://docs.python.org/3/library/random.html) object, and since the child class inherits all the attributes of the parent class, we can access this attribute from the VirusModel object. You can test this generator by simply instantiating a VirusModel object, accessing the random attribute and then the random.Random.random() method, this method will return a random float between 0 and 1.
+The mesa.model.Model class gives us a fundamental functionality for an ABM: a random generator. When we instantiate a VirusModel object the Pyhton interpreter executes the special `__new__` method of the mesa.model.Model class, this method instantiates for us a [random.Random](https://docs.python.org/3/library/random.html) object, and since the child class inherits all the attributes of the parent class, we can access this attribute from the VirusModel object. You can test this generator by simply instantiating a VirusModel object, accessing the random attribute and then the random.Random.random() method, this method will return a random float between 0 and 1.
 
 ```python
 if __name__ == "__main__":
@@ -182,7 +182,7 @@ If we want to reproduce two identical simulations we will just use the same seed
 When we create our Nodes we would need a place to store them. To solve this problem the Mesa package offers us the mesa.time module.
 This module offers 3 classes that we have to choose according to our modeling needs, we will not go into detail as they are perfectly explained on the [mesa.time module documentation.](https://mesa.readthedocs.io/en/master/apis/time.html) 
 
-For our model we will use the class mesa.time.RandomActivation, the scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of Netlogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
+For our model we will use the class mesa.time.RandomActivation, the scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of NetLogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
 
 ```
 from mesa.time import RandomActivation
@@ -277,7 +277,7 @@ end
 
 #### setup-nodes
 
-Let's skip the primitive [clear-all](http://ccl.northwestern.edu/netlogo/docs/dict/clear-all.html), in Python we don't need this, simply every time we want to create a new model we create another instance of VirusModel.
+Let's skip the primitive [clear-all](http://ccl.northwestern.edu/netlogo/docs/dict/clear-all.html). In Python we don't need this, simply every time we want to create a new model we create another instance of VirusModel.
 
 The  procedure setup-nodes defines a default form for all agents, a circle, then generates as many agents as required by the number-of-nodes parameter and assigns to each one an x value and a random y value on a plane activates the become-susceptible procedure and assigns a random value to the virus-check-timer attribute.
 
@@ -293,7 +293,7 @@ to setup-nodes
 end
 ```
 
-In NetLogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands, in Python we can emulate this behavior with a simple `for` cycle. Inside the model, we define a new setup-nodes method and implement a simple for loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. 
+In NetLogo the primitive [create-turtles number [ commands ]](http://ccl.northwestern.edu/netlogo/docs/dict/create-turtles.html) does nothing but create number agents and immediately execute the commands. In Python we can emulate this behavior with a simple `for` cycle. Inside the model, we define a new setup-nodes method and implement a simple `for` loop using the built-in range(number_of_nodes) function so the loop will do as many iterations as number_of_nodes. For each cycle we instantiate a new node, pass it the model and iteration number (this parameter will assign a unique_id to the single node based on the iteration number) as parameters and add the node to the scheduler. 
 
 ```python
 def setup_nodes(self):
@@ -305,7 +305,7 @@ def setup(self):
 	self.setup_nodes()
 ```
 
-Remember that every time a new Node is instantiated the special `__init__` method is executed, this means that we can specify the initial properties of each Node within the `__init__` of the Node and not within setup_nodes. To define the random coordinates of each node we just use the default_rng instance we created inside the model and called VirusModel.random the [numpy.random.default_rng.integers](https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.integers.html#numpy.random.Generator.integers) function returns an integer in a given range in this case we want an integer from 0 to VirusModel.space_width for the x and from 0 to VirusModel.space_height for the y. We have our random coordinates for each Node, now we give it an initial state, defined in NetLogo by the become-susceptible procedure that simply sets infected to False and resistant to False. and finally we set a virus-check-timer represented by a integer random from 0 to virus-check-frequency. 
+Remember that every time a new Node is instantiated the special `__init__` method is executed, this means that we can specify the initial properties of each Node within the `__init__` of the Node and not within setup_nodes. To define the random coordinates of each node we just use the default_rng instance we created inside the model and called VirusModel.random; the [numpy.random.default_rng.integers](https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.integers.html#numpy.random.Generator.integers) function returns an integer in a given range in this case we want an integer from 0 to VirusModel.space_width for the x and from 0 to VirusModel.space_height for the y. We have our random coordinates for each Node, now we give it an initial state, defined in NetLogo by the become-susceptible procedure that simply sets infected to False and resistant to False. and finally we set a virus-check-timer represented by a integer random from 0 to virus-check-frequency. 
 
 ```python
 class Node(Agent):
@@ -366,9 +366,9 @@ to setup-spatially-clustered-network
 end
 ```
 
-There are many ways to create a spatially clustered nework, for completeness in this guide we will follow the same algorithm used in NetLogo example code. The method that is used follows this procedure: It iterates for as many times as  a maximum number of links (num-links), when maximum is reached the procedure stops. Each iteration takes a random node and based on this a further node is taken that has no link with the first one and is the closest of all the other nodes. If there is a node with these characteristics these two nodes are connected. 
+There are many ways to create a spatially clustered network, for completeness in this guide we will follow the same algorithm used in the NetLogo example code. The method that is used follows this procedure: It iterates for as many times as  a maximum number of links (num-links), when maximum is reached the procedure stops. Each iteration takes a random node and based on this a further node is taken that has no link with the first one and is the closest of all the other nodes. If there is a node with these characteristics these two nodes are connected. 
 
-Before starting to translate this part of the code we need to define an attribute to keep inside each node its neighbors, or rather, the other nodes with which every other node has a link. Python offers sets which is a built-in data structures, sets are unordered and non-indexed collections. They are perfectly suited for this type of task as the sets cannot contain two equal values. Also sets are very fast when you need to check for the presence or absence of an object inside them. but they have a disadvantage, they do not preserve the order of insertion, they are unordered. This can create some problems. Let's assume for example that we need to extract a random element from a set. to do this we use the function numpy.random.choice() which however accepts a list. When we transform our set into a list the order is not deterministic. This implies that by using the same seed in the random generator will always have different draws. An explanation of why this occurs is beyond the scope of this tutorial. In case this keeps you up at night [here](https://www.youtube.com/watch?v=C4Kc8xzcA68) is a lengthy explanation. The solution is to assign a custom hash to our objects. Every object in Python has a value that makes it unique, this value is created automatically when the object is instantiated and depends on the memory slot it occupies. This number that determines uniqueness in turn determines the position of this item within the list when the set is transformed.
+Before starting to translate this part of the code we need to define an attribute to keep inside each node its neighbors, or rather, the other nodes with which every other node has a link. Python offers `set` which is a built-in data structures, sets are unordered and non-indexed collections. They are perfectly suited for this type of task as the sets cannot contain two equal values. Also sets are very fast when you need to check for the presence or absence of an object inside them. But they have a disadvantage, they do not preserve the order of insertion, they are unordered. This can create some problems. Let's assume for example that we need to extract a random element from a set. To do this we use the function numpy.random.choice() which however accepts a list. When we transform our set into a list the order is not deterministic. This implies that by using the same seed in the random generator will always have different draws. An explanation of why this occurs is beyond the scope of this tutorial. In case this keeps you up at night [here](https://www.youtube.com/watch?v=C4Kc8xzcA68) is a lengthy explanation. The solution is to assign a custom hash to our objects. Every object in Python has a value that makes it unique, this value is created automatically when the object is instantiated and depends on the memory slot it occupies. This number that determines uniqueness in turn determines the position of this item within the list when the set is transformed.
 We can override this through the `__hash__` attribute.
 
 We already assign a unique id to each node so the hash of our node might as well be deterministic. To implement this data structure we just need to insert a set attribute to our Node class and define a hash in this case the unique id of our node.
@@ -388,7 +388,7 @@ class Node(Agent):
         return self.unique_id
 ```
 
-We also create a method within the Node class that allows us to add other nodes to the neighbors list. The links we will create are undirected (e.g. if node1 is neighbor of node2 then node2 will also be neighbor of node1 [Notes on networks science.](https://mathinsight.org/network_introduction) ) The create_link_with function takes another node as argument and just adds the tow nodes in the respective neighbors sets, using the [Set.add()](https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset) built-in method. We also add another method within the Node class, Node.get_distance(). We need a function that calculates the distance between two nodes. Without reinventing the wheel, the scipy library offers the spatial.distance module, inside this module we find the euclidean function that allows us to calculate the euclidean distance between two points. Import the library on top of our script as follow: `from scipy.spatial import distance`. 
+We also create a method within the Node class that allows us to add other nodes to the neighbors list. The links we will create are undirected (e.g. if node1 is neighbor of node2 then node2 will also be neighbor of node1 [Notes on networks science.](https://mathinsight.org/network_introduction) ) The create_link_with function takes another node as argument and just adds the two nodes in the respective neighbors sets, using the [Set.add()](https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset) built-in method. We also add another method within the Node class, Node.get_distance(). We need a function that calculates the distance between two nodes. Without reinventing the wheel, the scipy library offers the spatial.distance module, inside this module we find the euclidean function that allows us to calculate the euclidean distance between two points. Import the library on top of our script as follow: `from scipy.spatial import distance`. 
 
 ```python
 def create_link_with(self, ego):
@@ -469,7 +469,7 @@ to setup
 end
 ```
 
-We have set up the nodes, we have created our spatially clustered network, to complete the setup we need to define an initial number of infected nodes. This in Python is quite easy, we need to take a number of nodes equal to `ViusModel.initial_outbreak_size` randomly and set their `infected` attribute to `True`.
+We have set up the nodes, we have created our spatially clustered network, to complete the setup we need to define an initial number of infected nodes. This in Python is quite easy, we need to take a number of nodes equal to `VirusModel.initial_outbreak_size` randomly and set their `infected` attribute to `True`.
 
 ```python
 def setup(self):
@@ -504,8 +504,8 @@ Setup completed! If you run the script again you should see the infected nodes:
 
 Summarizing this procedure does the following: 
 
-1. Check if there are infected nodes, if not the simulation is terminated. (2-3)
-2. Updates an internal clock for the agents that determines how often they are tested. (5-9)
+1. Check if there are infected nodes, if not the simulation is terminated (2-3)
+2. Updates an internal clock for the agents that determines how often they are tested (5-9)
 3. Activates the spread-virus procedure (10)
 4. Activates the do-virus-check procedure (11)
 5. Trigger tick (12)
@@ -627,7 +627,7 @@ to do-virus-checks
 end
 ```
 
-This procedure iterates over all nodes that are infected and have reached the time of testing and gives them a chance to become resistant or susceptible again. we create again a method inside VirusModel and call it do_virus_check. This is pretty simple and I don't think it needs any further explanation. 
+This procedure iterates over all nodes that are infected and have reached the time of testing and gives them a chance to become resistant or susceptible again. We create again a method inside VirusModel and call it do_virus_check. This is pretty simple and doesn't need any further explanation. 
 
 ```python
 def do_virus_check(self):
@@ -688,7 +688,7 @@ At this point every time we want to launch the model we must instantiate a `Viru
 
 In our run function we also want a way to signal to the user that the model is running correctly, even without a GUI. For this purpose we will use tqdm, a package to create simple progress bars. First install tqdm with this command: `pip install tqdm` and import it on top of the script `from tqdm import tqdm`.  The run function that we create takes 3 parameters: 
 
-**n_step:** this parameter takes as argument an integer number and defines the maximum number of model steps. Someone may ask, Can we set this to infinity? (since the simulation stops when there are no more infected nodes it might make sense). But it is not a good idea to put an infinite number of ticks, rather try to use a very large number as the maximum number. In case you want the simulation to run until there are no more infected nodes, you can change the run() function by adding a while loop instead of a for loop. In any case let's assign a default value to this parameter: 200 should be fine.
+**n_step:** this parameter takes as argument an integer number and defines the maximum number of model steps. Someone may ask, "Can we set this to infinity?" (since the simulation stops when there are no more infected nodes it might make sense). But it is not a good idea to put an infinite number of ticks, rather try to use a very large number as the maximum number. In case you want the simulation to run until there are no more infected nodes, you can change the run() function by adding a while loop instead of a for loop. In any case let's assign a default value to this parameter: 200 should be fine.
 
 **n_nodes:**  this parameter takes as argument an integer number and defines the number of nodes. If you remember we already assign the parameter `number_of_nodes` in the `__init__` of `VirusModel`, we want to continue to do so. So we put here a default parameter None, if nothing is passed the number assigned in the `__init__` of the model is used, otherwise we change `number_of_nodes` with the number we pass here. 
 
@@ -735,7 +735,7 @@ self.collector = DataCollector(
                 node.infected and not node.resistant])})
 ```
 
-Now all we need to do is call collector.collect() at each step to collect the data or rather to activate the lambda functions and take the results.
+Now all we need to do is to call collector.collect() at each step to collect the data or rather to activate the lambda functions and take the results.
 
 ```python
 def step(self):
@@ -782,7 +782,7 @@ How does Mesa visualization work? Mesa creates a webserver that communicates wit
 
 Here we will use the most pythonic way, matplolib. Already used for the show_space function and is the standard in Python for plotting things. What we're going to do is simply take the show_space function, add a few more pieces to it, and animate it. 
 
-The general idea here is to create 4 animated plots: one that shows us the same thing as show_space and 3 other plots that show us the number of susceptible, the number of infected and the number of resistant. First, we import the function that allows us to animate the plots: `import matplotlib.animation as animation`. After that we create a new method inside the VirusModel class: visualize_run. It will behave exactly like the VirusModel.run() method, but instead of showing a simple progress bar it will show a fantastic animated plot.  Then, following the run method we define a parameter n_nodes and give it a default value n_nodes and call the setup() method. Let's start with our figure, first, we instantiate it as a model attribute and add 4 sublots to it. When we add subplots to a figure we must specify the position through three arguments: (nrows, ncols, index). Quoting from [matplolib documentation](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplot.html): *"The subplot will take the index position on a grid with nrows rows and ncols columns. index starts at 1 in the upper left corner and increases to the right"*. This might seem strange the first time, but I assure you that with a couple of tries you will understand exactly what you are doing. At this point we create a new attribute of the VirusModel: `VirusModelsimulation`, and assign it an object of the class `matplotlib.animation.FuncAnimation()` that we imported at the beginning of the script. This class allows us to create an animated chart based on a function that updates the data at each step. The necessary arguments to pass are 3: a figure, a function that updates the data and a list of arguments to pass to the function. The figure is simple, you have already created one, let's pass it on. A function that updates the data, that we will create below and a number of initial arguments, 4 lists: one related to susceptible, one to infected, one to resistant and one related to tick.
+The general idea here is to create 4 animated plots: one that shows us the same thing as show_space and 3 other plots that show us the number of susceptible, the number of infected and the number of resistant. First, we import the function that allows us to animate the plots: `import matplotlib.animation as animation`. After that we create a new method inside the VirusModel class: visualize_run. It will behave exactly like the VirusModel.run() method, but instead of showing a simple progress bar it will show a fantastic animated plot.  Then, following the run method we define a parameter n_nodes and give it a default value n_nodes and call the setup() method. Let's start with our figure, first, we instantiate it as a model attribute and add 4 sublots to it. When we add subplots to a figure we must specify the position through three arguments: (nrows, ncols, index). Quoting from [matplolib documentation](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplot.html): *"The subplot will take the index position on a grid with nrows rows and ncols columns. Index starts at 1 in the upper left corner and increases to the right"*. This might seem strange the first time, but I assure you that with a couple of tries you will understand exactly what you are doing. At this point we create a new attribute of the VirusModel: `VirusModelsimulation`, and assign it an object of the class `matplotlib.animation.FuncAnimation()` that we imported at the beginning of the script. This class allows us to create an animated chart based on a function that updates the data at each step. The necessary arguments to pass are 3: a figure, a function that updates the data and a list of arguments to pass to the function. The figure is simple, you have already created one, let's pass it on. A function that updates the data, that we will create below and a number of initial arguments, 4 lists: one related to susceptible, one to infected, one to resistant and one related to tick.
 
 ```python
 def visulize_run(self, n_nodes=None):
