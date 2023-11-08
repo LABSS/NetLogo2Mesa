@@ -627,7 +627,7 @@ to do-virus-checks
 end
 ```
 
-This procedure iterates over all nodes that are infected and have reached the time of testing and gives them a chance to become resistant or susceptible again. we create again a method inside VirusModel and call it do_virus_check. This is pretty simple and I don't think it needs any further explanation. 
+This procedure iterates over all nodes that are infected and have reached the time of testing and gives them a chance to become resistant or susceptible again. We create again a method inside VirusModel and call it do_virus_check. This is pretty simple and I don't think it needs any further explanation. 
 
 ```python
 def do_virus_check(self):
