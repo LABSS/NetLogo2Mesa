@@ -735,7 +735,7 @@ self.collector = DataCollector(
                 node.infected and not node.resistant])})
 ```
 
-Now all we need to do is call collector.collect() at each step to collect the data or rather to activate the lambda functions and take the results.
+Now all we need to do is to call collector.collect() at each step to collect the data or rather to activate the lambda functions and take the results.
 
 ```python
 def step(self):
