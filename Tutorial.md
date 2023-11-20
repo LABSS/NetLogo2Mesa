@@ -259,7 +259,7 @@ Now that we have our blueprint, it is time to implement the procedures that orga
 ##### What does the Virus on a network Model setup do?
 
 The setup starts by generating all the necessary nodes (number-of-nodes) and gives it 3 fundamental properties: a position on space (defined by an x and y), an initial state (S) and a value for virus-check-timer. If we visualize our space at this point we will see many points stochastically positioned on a space.
-The next step is to join these points creating a network. The algorithm that performs this process is very simple, it defines a maximum number of nodes that depends on average-node-degree and number-of-nodes, starts a cycle of iterations that ends when the total number of links will be greater than the maximum number of links. Each iteration, a random node is taken and linked to another node nearby, as long as these two do not already have a link. Finally, a number of nodes equal to initial-outbreak-size is set to infected.
+The next step is to join these points creating a network. The algorithm that performs this process is very simple, it defines a maximum number of nodes that depends on average-node-degree and number-of-nodes, starts a cycle of iterations that continues as long as the total number of links is lower than the maximum number of allowed links". Each iteration, a random node is taken and linked to another node nearby, as long as these two do not already have a link. Finally, a number of nodes equal to initial-outbreak-size is set to infected.
 
 We will analyze and translate into Python procedure by procedure:
 
