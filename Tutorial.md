@@ -27,7 +27,7 @@ In case you want to get straight to the point, in the models folder you will fin
       - [Update the testing clock](#update-the-testing-clock)
       - [Spread the virus!](#spread-the-virus)
       - [Make them resistant!](#make-them-resistant)
-    + [Step 5, make it scientist-friendly](#step-5--make-it-scientist-friendly)
+    + [Step 5, make it scientist-friendly](#Step-5,-make-it-scientist-friendly)
       - [utility functions](#utility-functions)
       - [save the data](#save-the-data)
       - [visualize it!](#visualize-it)
