@@ -160,7 +160,7 @@ How do we implement it? Easy, first thing first import the module `from numpy.ra
 1. By passing a seed as a parameter to VirusModel's init, numpy.random.default_rng() must use that seed.
 2. If no seed is passed, the model must generate one, save it and use that seed for the numpy.random.default_rng() instance.
 
-To do this we add a new parameter, `seed`, to the __init__ of VirusModel. In order to implement behavior number 2, this parameter must take on a default value. We can use the os library and in particular the os.urandom() function to extract a string of bytes from our system. This function takes as parameter an integer, which represents the number of bytes of the string that is generated, 8 is more than enough. Also since it is a string of bytes we have to transform it into an integer using the sys library. 
+To do this we add a new parameter, `seed`, to the __init__ of VirusModel. In order to implement behavior number 2, this parameter must take on a default value. We can use the os library and in particular the `os.urandom()` function to extract a string of bytes from our system. This function takes as parameter an integer, which represents the number of bytes of the string that is generated, 8 is more than enough. Also since it is a string of bytes we have to transform it into an integer using the sys library. 
 
 ```python
 import os
@@ -181,7 +181,7 @@ If we want to reproduce two identical simulations we will just use the same seed
 When we create our Nodes we would need a place to store them. To solve this problem the Mesa package offers us the mesa.time module.
 This module offers 3 classes that we have to choose according to our modeling needs, we will not go into detail as they are perfectly explained on the [mesa.time module documentation.](https://mesa.readthedocs.io/en/stable/apis/time.html) 
 
-For our model we will use the class mesa.time.RandomActivation, the scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of NetLogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
+For our model we will use the class mesa.time.RandomActivation. The scheduler of this class activates agents randomly for each step, in short it clones the [ask primitive of NetLogo](http://ccl.northwestern.edu/netlogo/docs/dict/ask.html). Let's start implementing the scheduler, the first step is to import RandomActivation from the mesa.time module. 
 
 ```
 from mesa.time import RandomActivation
@@ -387,7 +387,7 @@ class Node(Agent):
         return self.unique_id
 ```
 
-We also create a method within the Node class that allows us to add other nodes to the neighbors list. The links we will create are undirected (e.g. if node1 is neighbor of node2 then node2 will also be neighbor of node1 [Notes on networks science.](https://mathinsight.org/network_introduction) ) The create_link_with function takes another node as argument and just adds the two nodes in the respective neighbors sets, using the [Set.add()](https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset) built-in method. We also add another method within the Node class, Node.get_distance(). We need a function that calculates the distance between two nodes. Without reinventing the wheel, the scipy library offers the spatial.distance module, inside this module we find the euclidean function that allows us to calculate the euclidean distance between two points. Import the library on top of our script as follow: `from scipy.spatial import distance`. 
+We also create a method within the Node class that allows us to add other nodes to the neighbors list. The links we will create are undirected (e.g. if node1 is neighbor of node2 then node2 will also be neighbor of node1 [Notes on networks science.](https://mathinsight.org/network_introduction) ). The create_link_with function takes another node as argument and just adds the two nodes in the respective neighbors sets, using the [set.add()](https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset) built-in method. We also add another method within the Node class, Node.get_distance(). We need a function that calculates the distance between two nodes. Without reinventing the wheel, the scipy library offers the spatial.distance module, inside this module we find the euclidean function that allows us to calculate the euclidean distance between two points. Import the library on top of our script as follow: `from scipy.spatial import distance`. 
 
 ```python
 def create_link_with(self, ego):
@@ -398,7 +398,7 @@ def get_distance(self, node):
     return distance.euclidean((self.x, self.y), (node.x, node.y))
 ```
 
-Let's return to the procedures that define the spatially clustered network, we define a maximum number of nodes (num_links) and start a cycle of iterations using a while loop.  This loop will make as many interactions as the num_links, to calculate all the links we create at each iteration we access the scheduler we iterate between nodes and for each node we calculate how many neighbors it has, add everything up and divide by two.  We take an agent (`from_agent`) randomly using the numpy.random.default_rng instance and the choice() function. At this point we need to find another node that is not connected to `from_node` and is the closest one to `from_nodes`. In NetLogo is: `(min-one-of (other turtles with [not link-neighbor? myself]) [distance myself])` In Python we can use the min function, which accepts a key and we use the function we have built earlier. At this point we have the two nodes, all we have to do is connect them together. We add an `if` to check that  `to_node` exists and then we join them together with the method we built earlier.
+Let's return to the procedures that define the spatially clustered network, we define a maximum number of nodes (num_links) and start a cycle of iterations using a while loop.  This loop will make as many interactions as the num_links, to calculate all the links we create at each iteration we access the scheduler we iterate between nodes and for each node we calculate how many neighbors it has, add everything up and divide by two.  We take an agent (`from_agent`) randomly using the numpy.random.default_rng instance and the choice() function. At this point we need to find another node that is not connected to `from_node` and is the closest one to `from_nodes`. In NetLogo is: `(min-one-of (other turtles with [not link-neighbor? myself]) [distance myself])` In Python we can use the `min` function, which accepts a key and we use the function we have built earlier. At this point we have the two nodes, all we have to do is to connect them together. We add an `if` to check that  `to_node` exists and then we join them together with the method we built earlier.
 
 ```python
 def setup_spatially_clustered_network(self):
@@ -521,7 +521,7 @@ def step(self):
 
 #### Update the testing clock
 
-This can be done in various ways, here we will use the Mesa scheduler for illustrative purposes. As we have said previously the Mesa `RandomActivation` scheduler besides offering us a place and methods to add and remove agents also offers us a `step()` method that allows us to activate agents in a random order. This works in a very simple way and assumes that all agents within the scheduler have a method called `step`. This way when `scheduler.step()` is called, each agent will activate its `step()` method in random order. 
+This can be done in various ways, here we will use the Mesa scheduler for illustrative purposes. As we have said previously, the Mesa `RandomActivation` scheduler besides offering us a place and methods to add and remove agents also offers us a `step()` method that allows us to activate agents in a random order. This works in a very simple way and assumes that all agents within the scheduler have a method called `step`. This way when `scheduler.step()` is called, each agent will activate its `step()` method in random order. 
 
 ```
 [
@@ -687,7 +687,7 @@ At this point every time we want to launch the model we must instantiate a `Viru
 
 In our run function we also want a way to signal to the user that the model is running correctly, even without a GUI. For this purpose we will use tqdm, a package to create simple progress bars. First install tqdm with this command: `pip install tqdm` and import it on top of the script `from tqdm import tqdm`.  The run function that we create takes 3 parameters: 
 
-**n_step:** this parameter takes as argument an integer number and defines the maximum number of model steps. Someone may ask, "Can we set this to infinity?" (since the simulation stops when there are no more infected nodes it might make sense). But it is not a good idea to put an infinite number of ticks, rather try to use a very large number as the maximum number. In case you want the simulation to run until there are no more infected nodes, you can change the run() function by adding a while loop instead of a for loop. In any case let's assign a default value to this parameter: 200 should be fine.
+**n_step:** this parameter takes as argument an integer number and defines the maximum number of model steps. Someone may ask, "Can we set this to infinity?" (since the simulation stops when there are no more infected nodes it might make sense). But it is not a good idea to put an infinite number of ticks, rather try to use a very large number as the maximum number. In case you want the simulation to run until there are no more infected nodes, you can change the run() function by adding a **while** loop instead of a **for** loop. In any case let's assign a default value to this parameter: 200 should be fine.
 
 **n_nodes:**  this parameter takes as argument an integer number and defines the number of nodes. If you remember we already assign the parameter `number_of_nodes` in the `__init__` of `VirusModel`, we want to continue to do so. So we put here a default parameter None, if nothing is passed the number assigned in the `__init__` of the model is used, otherwise we change `number_of_nodes` with the number we pass here. 
 
