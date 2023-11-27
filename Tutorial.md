@@ -31,7 +31,6 @@ In case you want to get straight to the point, in the models folder you will fin
       - [utility functions](#utility-functions)
       - [save the data](#save-the-data)
       - [visualize it!](#visualize-it)
-    + [Glosary](https://github.com/LABSS/NetLogo2Mesa/blob/master/Glossary.md)
 
 
 ## NetLogo2Mesa
