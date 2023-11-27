@@ -522,7 +522,7 @@ def step(self):
 
 #### Update the testing clock
 
-This can be done in various ways, here we will use the Mesa scheduler for illustrative purposes. As we have said previously the Mesa `RandomActivation` scheduler besides offering us a place and methods to add and remove agents also offers us a `step()` method that allows us to activate agents in a random order. This works in a very simple way and assumes that all agents within the scheduler have a method called `step`. This way when `scheduler.step()` is called, each agent will activate its `step()` method in random order. 
+This can be done in various ways, here we will use the Mesa scheduler for illustrative purposes. As we have said previously, the Mesa `RandomActivation` scheduler besides offering us a place and methods to add and remove agents also offers us a `step()` method that allows us to activate agents in a random order. This works in a very simple way and assumes that all agents within the scheduler have a method called `step`. This way when `scheduler.step()` is called, each agent will activate its `step()` method in random order. 
 
 ```
 [
