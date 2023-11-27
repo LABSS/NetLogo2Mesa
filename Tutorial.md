@@ -126,7 +126,7 @@ class Node():
 
 ### 2. Enhance Core classes
 
-Before we go to write the procedures of our model and our agents, we must have a machine that has the necessary functionality. The Mesa package gives us some interesting tools to enhance our model, which otherwise were to be implemented from scratch. The [two basic Mesa modules](https://mesa.readthedocs.io/en/master/apis/init.html) are mesa.agent and mesa.model, these modules give us the basic mesa.model.Model and mesa.agent.Agent classes. These two classes, have their methods and attributes that we want to implement within our VirusModel (our model) and Node (our agents). In Python this mechanism is implementable through inheritance, when we create a new class, passing as parameter an existing class, the new class will inherit all methods and attributes. 
+Before we go to write the procedures of our model and our agents, we must have a machine that has the necessary functionality. The Mesa package gives us some interesting tools to enhance our model, which otherwise were to be implemented from scratch. The [two basic Mesa modules](https://mesa.readthedocs.io/en/stable/apis/init.html) are mesa.agent and mesa.model, these modules give us the basic mesa.model.Model and mesa.agent.Agent classes. These two classes, have their methods and attributes that we want to implement within our VirusModel (our model) and Node (our agents). In Python this mechanism is implementable through inheritance, when we create a new class, passing as parameter an existing class, the new class will inherit all methods and attributes. 
 
 ```python
 from mesa.model import Model
