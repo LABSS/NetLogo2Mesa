@@ -1,6 +1,6 @@
 # How to convert a model from NetLogo to Mesa
 
-This is a cheatsheet for quick conversion of the most important instructions from [NetLogo](https://ccl.northwestern.edu/netlogo/) to Python, with the [Mesa](https://github.com/projectmesa/mesa) implementation as a target.
+This is a short list for quick conversion of the most important instructions from [NetLogo](https://ccl.northwestern.edu/netlogo/) to Python, with the [Mesa](https://github.com/projectmesa/mesa) implementation as a target.
 
 ## Create conversion patterns
 
